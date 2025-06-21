@@ -8,8 +8,8 @@ interface Props extends astroHTML.JSX.SVGAttributes {
 const { color = "black", opacity = 0.2, fillOpacity = 0.1, ...props } = Astro.props;
 ---
 
-<svg width="428" height="1741" viewBox="0 0 428 1741" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-  <g clip-path="url(#skateboard-template-clip)">
+<svg style="aspect-ratio: 428/1741" viewBox="0 0 428 1741" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+  <g>
     <path
       d="M423.711 1527.14C423.711 1644.66 329.682 1737 213.855 1737C98.0288 1737 4 1644.66 4 1527.14V213.855C4 98.0288 98.0288 4 213.855 4C329.682 4 423.711 98.0288 423.711 213.855V1527.14Z"
       stroke={color}
@@ -74,11 +74,4 @@ const { color = "black", opacity = 0.2, fillOpacity = 0.1, ...props } = Astro.pr
       fill={color}
       fill-opacity={fillOpacity}></path>
   </g>
-  <defs>
-    <clipPath id="skateboard-template-clip">
-      <path
-        d="M423.711 1527.14C423.711 1644.66 329.682 1737 213.855 1737C98.0288 1737 4 1644.66 4 1527.14V213.855C4 98.0288 98.0288 4 213.855 4C329.682 4 423.711 98.0288 423.711 213.855V1527.14Z"
-      ></path>
-    </clipPath>
-  </defs>
 </svg>
