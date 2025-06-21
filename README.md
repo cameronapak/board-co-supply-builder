@@ -1,21 +1,9 @@
-# Freedom Stack v2 (WIP)
-
-> [!IMPORTANT]
-> This project is still a work in progress. It's improving continuously and will be ready soon.
-> Documentation for using this project is currently limited but will be expanded shortly.
+# Skateboard Deck Designer App for Board Co Supply
 
 ## Tasks
 
 - [ ] Add `.cursorrules`
 - [ ] Can I add recommendations MCP's for each repo in `.vscode` folder?
-
-## Criteria for Freedom Stack v2
-
-1. Must feel elementary/vanilla to use and be easy to learn
-2. Must be financially accessible to all, meaning it should at least be able to be hosted for free at base tier without having to add a credit card
-3. Must be entirely self-hostable (if needed)
-4. Must use well-maintained, actively developed packages to ensure long-term sustainability
-5. Must be able to work well with AI code editor assistants
 
 ## Stack
 
@@ -81,10 +69,3 @@ Now, let's run the app!
 ```bash
 npm run dev
 ```
-
-## Main changes since v1
-
-1. We've replaced Astro DB with Bknd
-2. Better Auth has been replaced with Bknd's built-in auth
-3. Instead of using daisyUI, we now use Basecoat (think `shadcn-ui` but without React)
-4. Instead of HTMX, we use Alpine Ajax (if you don't know what either one of these are... it's okay)
