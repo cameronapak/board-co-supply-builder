@@ -1,0 +1,42 @@
+---
+import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
+---
+
+<div x-data="skateboardDesigner">
+  <div class="relative">
+    <SkateboardTemplate />
+    <img
+      x-show="imageUrl"
+      :src="imageUrl"
+      alt="Uploaded skateboard design"
+      class="pointer-events-none absolute top-0 right-0 bottom-0 left-0 h-full w-full object-cover"
+      style="clip-path: url(#skateboard-template-clip);"
+    />
+  </div>
+
+  <input type="file" accept="image/*" @change="handleFileChange($event)" />
+</div>
+
+<script>
+  import Alpine from "alpinejs";
+
+  document.addEventListener("alpine:init", () => {
+    Alpine.data("skateboardDesigner", function () {
+      return {
+        imageUrl: "",
+        handleFileChange(event: Event) {
+          const file = (event.target as HTMLInputElement).files?.[0];
+          if (!file) {
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            this.imageUrl = e.target?.result as string;
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+    });
+  });
+</script>
