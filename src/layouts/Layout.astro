@@ -1,0 +1,69 @@
+---
+import "@/styles/global.css";
+import Header from "@/components/Header.astro";
+
+interface Props {
+  title: string;
+}
+
+const flash = Astro.cookies.get("__bknd_flash");
+
+const { title = "Freedom Stack v2" } = Astro.props as Props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <!-- "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life." John 3:16 NIV -->
+    <title>{title}</title>
+  </head>
+
+  <body class="bg-(background) text-(foreground)">
+    <Header />
+    {
+      flash && (
+        <div
+          x-data="{ open: false }"
+          x-show="open"
+          x-init="$nextTick(() => open = true)"
+          x-transition
+          @click="open = false; await cookieStore.delete('__bknd_flash');"
+          class="alert fixed top-4 right-4 z-50 max-w-xs shadow-lg"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" x2="12" y1="8" y2="12" />
+            <line x1="12" x2="12.01" y1="16" y2="16" />
+          </svg>
+          <h2>{JSON.parse(flash.value).message}</h2>
+          <section>{JSON.parse(flash.value).description}</section>
+        </div>
+      )
+    }
+    <slot />
+  </body>
+
+  {/* AlpineJS */}
+  <script>
+    // @ts-ignore - No up to date types for this package
+    import Alpine from "alpinejs";
+    // @ts-ignore - No types for this package
+    import ajax from "@imacrayon/alpine-ajax";
+    window.Alpine = Alpine;
+    Alpine.plugin(ajax);
+    Alpine.start();
+  </script>
+</html>

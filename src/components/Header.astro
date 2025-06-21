@@ -1,0 +1,22 @@
+---
+import BirdIcon from "@/assets/lucide/bird.svg";
+import Authenticated from "./Authenticated.astro";
+---
+
+<header class="bg-background sticky inset-x-0 top-0 isolate z-10 flex shrink-0 items-center gap-2 border-b">
+  <div class="mx-auto flex h-14 w-full max-w-md items-center gap-2 px-6">
+    <a href="/" class="font-medium">
+      <BirdIcon class="text-primary h-6 w-6" />
+    </a>
+    <div class="ml-auto flex items-center gap-2">
+      <Authenticated>
+        <a class="btn-ghost" href="/admin">Admin</a>
+        <a class="btn-ghost" slot="fallback" href="/register">Register</a>
+      </Authenticated>
+      <Authenticated>
+        <a class="btn-outline" slot="fallback" href="/login">Login</a>
+        <a class="btn-ghost" href="/logout">Logout</a>
+      </Authenticated>
+    </div>
+  </div>
+</header>

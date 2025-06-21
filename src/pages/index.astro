@@ -1,0 +1,27 @@
+---
+import { getApi } from "@/bknd.ts";
+import Layout from "@/layouts/Layout.astro";
+
+const api = await getApi(Astro.request.headers, { verify: true, mode: "dynamic" });
+
+const { data } = await api.data.readMany("posts");
+const user = api.getUser();
+---
+
+<Layout title="Freedom Stack v2">
+  <section class="mx-auto flex max-w-md flex-col gap-4 p-6">
+    <h1 class="heading-1">Freedom Stack v2</h1>
+    {user?.email ? <p>Logged in as {user.email}</p> : <p>Not logged in</p>}
+    <h2 class="heading-2">Posts</h2>
+    <ul>
+      {
+        data.map((post) => (
+          <li>
+            <h3 class="heading-3">{post.title}</h3>
+            <p class="paragraph line-clamp-2">{post.content?.slice(0, 256)}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Layout>
