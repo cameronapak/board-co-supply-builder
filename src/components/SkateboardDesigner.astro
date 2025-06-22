@@ -21,8 +21,8 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
     <div
       x-show="imageUrl"
       class="absolute top-0 right-0 bottom-0 left-0 z-5 cursor-move"
-      @mousedown.debounce.100ms="startPan($event)"
-      @touchstart.debounce.100ms="startPan($event)"
+      @mousedown="startPan($event)"
+      @touchstart="startPan($event)"
     >
       <img
         :src="imageUrl"
@@ -38,8 +38,8 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
       x-show="imageUrl"
       class="absolute top-0 right-0 bottom-0 left-0 z-10 cursor-move"
       style="clip-path: url(#skateboard-clip);"
-      @mousedown.debounce.100ms="startPan($event)"
-      @touchstart.debounce.100ms="startPan($event)"
+      @mousedown="startPan($event)"
+      @touchstart="startPan($event)"
     >
       <img
         :src="imageUrl"
