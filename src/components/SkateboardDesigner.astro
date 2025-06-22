@@ -3,10 +3,28 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
 ---
 
 <div x-data="skateboardDesigner">
-  <div class="relative h-[512px] w-fit" style="aspect-ratio: 428/1741; clip-path: url(#skateboard-clip);">
+  <div class="relative h-[512px] w-fit" style="aspect-ratio: 428/1741;">
+    <!-- Background layer - full image with reduced opacity (always visible) -->
+    <div
+      x-show="imageUrl"
+      class="absolute top-0 right-0 bottom-0 left-0 z-5 cursor-move"
+      @mousedown.debounce.100ms="startPan($event)"
+      @touchstart.debounce.100ms="startPan($event)"
+    >
+      <img
+        :src="imageUrl"
+        alt="Uploaded skateboard design background"
+        class="pointer-events-none h-full w-full object-contain opacity-20 select-none"
+        :style="`transform: translate(${panX}px, ${panY}px);`"
+        draggable="false"
+      />
+    </div>
+
+    <!-- Clipped layer - full opacity image only within skateboard bounds -->
     <div
       x-show="imageUrl"
       class="absolute top-0 right-0 bottom-0 left-0 z-10 cursor-move"
+      style="clip-path: url(#skateboard-clip);"
       @mousedown.debounce.100ms="startPan($event)"
       @touchstart.debounce.100ms="startPan($event)"
     >
@@ -18,6 +36,7 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
         draggable="false"
       />
     </div>
+
     <SkateboardTemplate class="pointer-events-none absolute top-0 right-0 bottom-0 left-0 z-20 h-full w-full" />
   </div>
 
@@ -25,6 +44,9 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
 
   <div x-show="imageUrl" class="mt-4 text-sm text-gray-600">
     <p>Drag the image to reposition it on the skateboard</p>
+    <p class="mt-1 text-xs text-gray-500">
+      The faded image shows the full area - the bright version shows what will be visible on the skateboard
+    </p>
     <button @click="resetPosition()" class="mt-2 rounded bg-gray-200 px-3 py-1 text-sm hover:bg-gray-300">
       Reset Position
     </button>
