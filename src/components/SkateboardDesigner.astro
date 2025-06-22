@@ -3,55 +3,57 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
 ---
 
 <div x-data="skateboardDesigner" class="grid grid-cols-2 gap-4">
-  <div
-    class="relative h-[512px] w-fit"
-    style="aspect-ratio: 428/1741;"
-    @wheel.prevent.throttle.50ms="handleWheel($event)"
-  >
-    <!-- Snap lines - only visible when dragging -->
-    <div x-show="isDragging" class="pointer-events-none absolute top-0 right-0 bottom-0 left-0 z-15">
-      <!-- Vertical center line -->
-      <div class="absolute top-0 bottom-0 w-px bg-blue-500 opacity-80" style="left: 50%;"></div>
-
-      <!-- Horizontal center line -->
-      <div class="absolute right-0 left-0 h-px bg-blue-500 opacity-80" style="top: 50%;"></div>
-    </div>
-
-    <!-- Background layer - full image with reduced opacity (always visible) -->
+  <main class="flex justify-center overflow-hidden rounded-lg border p-6">
     <div
-      x-show="imageUrl"
-      class="absolute top-0 right-0 bottom-0 left-0 z-5 cursor-move"
-      @mousedown="startPan($event)"
-      @touchstart="startPan($event)"
+      class="relative h-[512px] w-fit"
+      style="aspect-ratio: 428/1741;"
+      @wheel.prevent.throttle.50ms="handleWheel($event)"
     >
-      <img
-        :src="imageUrl"
-        alt="Uploaded skateboard design background"
-        class="pointer-events-none h-full w-full object-contain opacity-20 select-none"
-        :style="`transform: translate(${panX}px, ${panY}px) scale(${zoom}) rotate(${rotation}deg);`"
-        draggable="false"
-      />
-    </div>
+      <!-- Snap lines - only visible when dragging -->
+      <div x-show="isDragging" class="pointer-events-none absolute top-0 right-0 bottom-0 left-0 z-15">
+        <!-- Vertical center line -->
+        <div class="absolute top-0 bottom-0 w-px bg-blue-500 opacity-80" style="left: 50%;"></div>
 
-    <!-- Clipped layer - full opacity image only within skateboard bounds -->
-    <div
-      x-show="imageUrl"
-      class="absolute top-0 right-0 bottom-0 left-0 z-10 cursor-move"
-      style="clip-path: url(#skateboard-clip);"
-      @mousedown="startPan($event)"
-      @touchstart="startPan($event)"
-    >
-      <img
-        :src="imageUrl"
-        alt="Uploaded skateboard design"
-        class="pointer-events-none h-full w-full object-contain select-none"
-        :style="`transform: translate(${panX}px, ${panY}px) scale(${zoom}) rotate(${rotation}deg);`"
-        draggable="false"
-      />
-    </div>
+        <!-- Horizontal center line -->
+        <div class="absolute right-0 left-0 h-px bg-blue-500 opacity-80" style="top: 50%;"></div>
+      </div>
 
-    <SkateboardTemplate class="pointer-events-none absolute top-0 right-0 bottom-0 left-0 z-20 h-full w-full" />
-  </div>
+      <!-- Background layer - full image with reduced opacity (always visible) -->
+      <div
+        x-show="imageUrl"
+        class="absolute top-0 right-0 bottom-0 left-0 z-5 cursor-move"
+        @mousedown="startPan($event)"
+        @touchstart="startPan($event)"
+      >
+        <img
+          :src="imageUrl"
+          alt="Uploaded skateboard design background"
+          class="pointer-events-none h-full w-full object-contain opacity-20 select-none"
+          :style="`transform: translate(${panX}px, ${panY}px) scale(${zoom}) rotate(${rotation}deg);`"
+          draggable="false"
+        />
+      </div>
+
+      <!-- Clipped layer - full opacity image only within skateboard bounds -->
+      <div
+        x-show="imageUrl"
+        class="absolute top-0 right-0 bottom-0 left-0 z-10 cursor-move"
+        style="clip-path: url(#skateboard-clip);"
+        @mousedown="startPan($event)"
+        @touchstart="startPan($event)"
+      >
+        <img
+          :src="imageUrl"
+          alt="Uploaded skateboard design"
+          class="pointer-events-none h-full w-full object-contain select-none"
+          :style="`transform: translate(${panX}px, ${panY}px) scale(${zoom}) rotate(${rotation}deg);`"
+          draggable="false"
+        />
+      </div>
+
+      <SkateboardTemplate class="pointer-events-none absolute top-0 right-0 bottom-0 left-0 z-20 h-full w-full" />
+    </div>
+  </main>
 
   <aside>
     <input type="file" accept="image/*" @change="handleFileChange($event)" />
