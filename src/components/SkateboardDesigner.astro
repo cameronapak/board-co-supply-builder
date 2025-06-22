@@ -3,7 +3,7 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
 ---
 
 <div x-data="skateboardDesigner" class="grid grid-cols-2 gap-8">
-  <main class="bg-secondary flex justify-center overflow-hidden rounded-lg border p-6">
+  <main class="bg-secondary flex justify-center overflow-hidden rounded-xl border p-6">
     <div
       class="relative h-[512px] w-fit"
       style="aspect-ratio: 428/1741;"
@@ -28,7 +28,7 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
         <img
           :src="imageUrl"
           alt="Uploaded skateboard design background"
-          class="pointer-events-none h-full w-full object-contain opacity-20 select-none"
+          class="pointer-events-none h-full w-full object-contain opacity-10 select-none"
           :style="`transform: translate(${panX}px, ${panY}px) scale(${zoom}) rotate(${rotation}deg);`"
           draggable="false"
         />
@@ -58,8 +58,9 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
   <aside class="flex w-full flex-col gap-4">
     <h1 class="heading-1">Skateboard Designer</h1>
 
-    <div class="relative w-full">
+    <div x-show="!imageUrl" class="relative w-full">
       <input
+        x-ref="fileInput"
         class="absolute inset-0 cursor-pointer opacity-0"
         type="file"
         accept="image/*"
@@ -70,14 +71,13 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
         :class="imageUrl ? 'btn-secondary w-full' : 'btn w-full'"
         type="button"
         @click="$el.previousElementSibling.click()"
-        x-text="imageUrl ? 'Replace Image' : 'Choose Image'"
       >
         Choose Image
       </button>
     </div>
 
-    <div x-show="imageUrl" class="mt-4 text-sm text-gray-600">
-      <p class="paragraph leading-tight">Drag the image to reposition it on the skateboard</p>
+    <div x-show="imageUrl">
+      <p class="paragraph text-muted-foreground leading-tight">Drag the image to reposition it on the skateboard</p>
 
       <div class="mt-3 flex items-center gap-3 border-b pb-3">
         <div class="grid w-full grid-cols-[1fr_auto] gap-2">
@@ -182,7 +182,12 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
         </div>
       </div>
 
-      <button @click="resetAll()" class="btn-ghost mt-4 w-full">Reset All</button>
+      <div class="grid w-full grid-cols-2 gap-2 border-b py-3">
+        <button @click="resetAll()" class="btn-outline">Reset</button>
+        <button @click="resetImage()" class="btn-outline">Change Image</button>
+      </div>
+
+      <button class="btn mt-4 w-full">Order My Board</button>
     </div>
   </aside>
 </div>
@@ -375,6 +380,12 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
           this.panY = 0;
           this.zoom = 1;
           this.rotation = 0;
+        },
+
+        resetImage() {
+          this.imageUrl = "";
+          (this.$refs.fileInput as HTMLInputElement).value = "";
+          this.resetAll();
         },
 
         // Helper method for quick positioning
