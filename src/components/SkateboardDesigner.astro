@@ -2,7 +2,7 @@
 import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
 ---
 
-<div x-data="skateboardDesigner" class="grid grid-cols-2 gap-4">
+<div x-data="skateboardDesigner" class="grid grid-cols-2 gap-8">
   <main class="bg-secondary flex justify-center overflow-hidden rounded-lg border p-6">
     <div
       class="relative h-[512px] w-fit"
@@ -55,8 +55,26 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
     </div>
   </main>
 
-  <aside>
-    <input type="file" accept="image/*" @change="handleFileChange($event)" />
+  <aside class="flex flex-col gap-4">
+    <h1 class="heading-1">Skateboard Designer</h1>
+
+    <div class="relative w-full">
+      <input
+        class="absolute inset-0 cursor-pointer opacity-0"
+        type="file"
+        accept="image/*"
+        @change="handleFileChange($event)"
+        id="file-input"
+      />
+      <button
+        :class="imageUrl ? 'btn-outline' : 'btn'"
+        type="button"
+        @click="$el.previousElementSibling.click()"
+        x-text="imageUrl ? 'Replace Image' : 'Choose Image'"
+      >
+        Choose Image
+      </button>
+    </div>
 
     <div x-show="imageUrl" class="mt-4 text-sm text-gray-600">
       <p>Drag the image to reposition it on the skateboard</p>
