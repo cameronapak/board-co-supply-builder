@@ -3,8 +3,7 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
 ---
 
 <div x-data="skateboardDesigner">
-  <div class="relative h-[512px] w-fit rounded-t-full rounded-b-full" style="aspect-ratio: 428/1741;">
-    <SkateboardTemplate class="pointer-events-none absolute top-0 right-0 bottom-0 left-0 z-20 h-full w-full" />
+  <div class="relative h-[512px] w-fit" style="aspect-ratio: 428/1741; clip-path: url(#skateboard-clip);">
     <div
       x-show="imageUrl"
       class="absolute top-0 right-0 bottom-0 left-0 z-10 cursor-move"
@@ -15,10 +14,11 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
         :src="imageUrl"
         alt="Uploaded skateboard design"
         class="pointer-events-none h-full w-full object-contain select-none"
-        :style="`transform: translate(${panX}px, ${panY}px)`"
+        :style="`transform: translate(${panX}px, ${panY}px);`"
         draggable="false"
       />
     </div>
+    <SkateboardTemplate class="pointer-events-none absolute top-0 right-0 bottom-0 left-0 z-20 h-full w-full" />
   </div>
 
   <input type="file" accept="image/*" @change="handleFileChange($event)" />

@@ -9,6 +9,13 @@ const { color = "black", opacity = 0.2, fillOpacity = 0.1, ...props } = Astro.pr
 ---
 
 <svg style="aspect-ratio: 428/1741" viewBox="0 0 428 1741" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+  <defs>
+    <clipPath id="skateboard-clip" clipPathUnits="objectBoundingBox">
+      <path
+        d="M 0.99 0.877 C 0.99 0.945 0.77 1 0.5 1 C 0.23 1 0.01 0.945 0.01 0.877 L 0.01 0.123 C 0.01 0.056 0.23 0 0.5 0 C 0.77 0 0.99 0.056 0.99 0.123 L 0.99 0.877 Z"
+      ></path>
+    </clipPath>
+  </defs>
   <g>
     <path
       d="M423.711 1527.14C423.711 1644.66 329.682 1737 213.855 1737C98.0288 1737 4 1644.66 4 1527.14V213.855C4 98.0288 98.0288 4 213.855 4C329.682 4 423.711 98.0288 423.711 213.855V1527.14Z"
