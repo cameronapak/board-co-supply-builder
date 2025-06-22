@@ -28,7 +28,7 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
         :src="imageUrl"
         alt="Uploaded skateboard design background"
         class="pointer-events-none h-full w-full object-contain opacity-20 select-none"
-        :style="`transform: translate(${panX}px, ${panY}px) scale(${zoom});`"
+        :style="`transform: translate(${panX}px, ${panY}px) scale(${zoom}) rotate(${rotation}deg);`"
         draggable="false"
       />
     </div>
@@ -45,7 +45,7 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
         :src="imageUrl"
         alt="Uploaded skateboard design"
         class="pointer-events-none h-full w-full object-contain select-none"
-        :style="`transform: translate(${panX}px, ${panY}px) scale(${zoom});`"
+        :style="`transform: translate(${panX}px, ${panY}px) scale(${zoom}) rotate(${rotation}deg);`"
         draggable="false"
       />
     </div>
@@ -90,6 +90,31 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
         </button>
       </div>
 
+      <!-- Rotation Controls -->
+      <div class="mt-3 flex items-center gap-3">
+        <span class="text-xs text-gray-600">Rotate:</span>
+        <div class="flex items-center gap-2">
+          <button
+            @click="rotateLeft()"
+            class="rounded bg-gray-200 px-2 py-1 text-sm hover:bg-gray-300"
+            title="Rotate 90° counter-clockwise"
+          >
+            ↺
+          </button>
+          <span class="min-w-[40px] text-center text-xs text-gray-600" x-text="`${rotation}°`"></span>
+          <button
+            @click="rotateRight()"
+            class="rounded bg-gray-200 px-2 py-1 text-sm hover:bg-gray-300"
+            title="Rotate 90° clockwise"
+          >
+            ↻
+          </button>
+        </div>
+        <button @click="resetRotation()" class="rounded bg-gray-200 px-3 py-1 text-sm hover:bg-gray-300">
+          Reset Rotation
+        </button>
+      </div>
+
       <!-- Position Controls -->
       <div class="mt-3 flex flex-wrap gap-2">
         <button @click="centerImage()" class="rounded bg-blue-100 px-3 py-1 text-sm text-blue-700 hover:bg-blue-200">
@@ -116,6 +141,7 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
         panX: 0,
         panY: 0,
         zoom: 1,
+        rotation: 0,
         minZoom: 0.1,
         maxZoom: 5,
         zoomStep: 0.1,
@@ -176,6 +202,21 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
 
         resetZoom() {
           this.zoom = 1;
+        },
+
+        rotateLeft() {
+          this.rotation = (this.rotation - 90) % 360;
+          if (this.rotation < 0) {
+            this.rotation += 360;
+          }
+        },
+
+        rotateRight() {
+          this.rotation = (this.rotation + 90) % 360;
+        },
+
+        resetRotation() {
+          this.rotation = 0;
         },
 
         startPan(event: MouseEvent | TouchEvent) {
@@ -277,6 +318,7 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
           this.panX = 0;
           this.panY = 0;
           this.zoom = 1;
+          this.rotation = 0;
         },
 
         // Helper method for quick positioning
