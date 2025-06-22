@@ -5,15 +5,30 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
 <div x-data="skateboardDesigner">
   <div class="relative h-[512px] w-fit overflow-hidden rounded-t-full rounded-b-full" style="aspect-ratio: 428/1741;">
     <SkateboardTemplate class="pointer-events-none absolute top-0 right-0 bottom-0 left-0 z-20 h-full w-full" />
-    <img
+    <div
       x-show="imageUrl"
-      :src="imageUrl"
-      alt="Uploaded skateboard design"
-      class="absolute top-0 right-0 bottom-0 left-0 z-10 h-full w-full object-cover"
-    />
+      class="absolute top-0 right-0 bottom-0 left-0 z-10 cursor-move"
+      @mousedown="startPan($event)"
+      @touchstart="startPan($event)"
+    >
+      <img
+        :src="imageUrl"
+        alt="Uploaded skateboard design"
+        class="pointer-events-none h-full w-full object-cover select-none"
+        :style="`transform: translate(${panX}px, ${panY}px)`"
+        draggable="false"
+      />
+    </div>
   </div>
 
   <input type="file" accept="image/*" @change="handleFileChange($event)" />
+
+  <div x-show="imageUrl" class="mt-4 text-sm text-gray-600">
+    <p>Drag the image to reposition it on the skateboard</p>
+    <button @click="resetPosition()" class="mt-2 rounded bg-gray-200 px-3 py-1 text-sm hover:bg-gray-300">
+      Reset Position
+    </button>
+  </div>
 </div>
 
 <script>
@@ -23,6 +38,14 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
     Alpine.data("skateboardDesigner", function () {
       return {
         imageUrl: "",
+        panX: 0,
+        panY: 0,
+        isDragging: false,
+        startX: 0,
+        startY: 0,
+        initialPanX: 0,
+        initialPanY: 0,
+
         handleFileChange(event: Event) {
           const file = (event.target as HTMLInputElement).files?.[0];
           if (!file) {
@@ -32,8 +55,67 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
           const reader = new FileReader();
           reader.onload = (e) => {
             this.imageUrl = e.target?.result as string;
+            this.resetPosition();
           };
           reader.readAsDataURL(file);
+        },
+
+        startPan(event: MouseEvent | TouchEvent) {
+          this.isDragging = true;
+          this.initialPanX = this.panX;
+          this.initialPanY = this.panY;
+
+          if (event instanceof MouseEvent) {
+            this.startX = event.clientX;
+            this.startY = event.clientY;
+          } else {
+            this.startX = event.touches[0].clientX;
+            this.startY = event.touches[0].clientY;
+          }
+
+          // Add global event listeners
+          document.addEventListener("mousemove", this.handlePan.bind(this));
+          document.addEventListener("mouseup", this.endPan.bind(this));
+          document.addEventListener("touchmove", this.handlePan.bind(this));
+          document.addEventListener("touchend", this.endPan.bind(this));
+
+          event.preventDefault();
+        },
+
+        handlePan(event: MouseEvent | TouchEvent) {
+          if (!this.isDragging) return;
+
+          let currentX, currentY;
+          if (event instanceof MouseEvent) {
+            currentX = event.clientX;
+            currentY = event.clientY;
+          } else {
+            currentX = event.touches[0].clientX;
+            currentY = event.touches[0].clientY;
+          }
+
+          const deltaX = currentX - this.startX;
+          const deltaY = currentY - this.startY;
+
+          this.panX = this.initialPanX + deltaX;
+          this.panY = this.initialPanY + deltaY;
+
+          event.preventDefault();
+        },
+
+        endPan() {
+          this.isDragging = false;
+
+          // Remove global event listeners
+          document.removeEventListener("mousemove", this.handlePan.bind(this));
+          document.removeEventListener("mouseup", this.endPan.bind(this));
+          document.removeEventListener("touchmove", this.handlePan.bind(this));
+          document.removeEventListener("touchend", this.endPan.bind(this));
+        },
+
+        resetPosition() {
+          this.panX = 0;
+          this.panY = 0;
         }
       };
     });
