@@ -3,13 +3,13 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
 ---
 
 <div x-data="skateboardDesigner">
-  <div class="relative h-[512px] w-fit overflow-hidden rounded-t-full rounded-b-full" style="aspect-ratio: 428/1741;">
+  <div class="relative h-[512px] w-fit rounded-t-full rounded-b-full" style="aspect-ratio: 428/1741;">
     <SkateboardTemplate class="pointer-events-none absolute top-0 right-0 bottom-0 left-0 z-20 h-full w-full" />
     <div
       x-show="imageUrl"
       class="absolute top-0 right-0 bottom-0 left-0 z-10 cursor-move"
-      @mousedown="startPan($event)"
-      @touchstart="startPan($event)"
+      @mousedown.debounce.100ms="startPan($event)"
+      @touchstart.debounce.100ms="startPan($event)"
     >
       <img
         :src="imageUrl"
