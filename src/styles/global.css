@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @import "basecoat-css";
 
+* {
+  @apply shrink-0 select-none;
+}
+
 /* Styles adopted from Shadcn UI */
 @layer components {
   /* Typography classes */
