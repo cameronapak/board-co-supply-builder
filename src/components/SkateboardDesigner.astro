@@ -194,7 +194,8 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
 
 <script>
   import Alpine from "alpinejs";
-  import * as pdfjsLib from "pdfjs-dist/build/pdf";
+  import * as pdfjsLib from "pdfjs-dist";
+  import { validateArtwork } from "@/utils/index.ts";
 
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
@@ -232,6 +233,16 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
         async handleFileChange(event: Event) {
           const file = (event.target as HTMLInputElement).files?.[0];
           if (!file) {
+            return;
+          }
+
+          const validationResult = await validateArtwork(file);
+
+          if (!validationResult.valid) {
+            const suggestions = validationResult.details?.suggestions?.join("\n- ");
+            const alertMessage = `${validationResult.message}\n\nSuggestions:\n${suggestions ? `- ${suggestions}` : "None"}`;
+            window.alert(alertMessage);
+            (this.$refs.fileInput as HTMLInputElement).value = ""; // Reset file input
             return;
           }
 
