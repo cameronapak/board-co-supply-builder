@@ -364,7 +364,7 @@ export async function validateArtwork(file: File): Promise<ValidationResult> {
             ].filter(Boolean)
           }
         };
-      } catch (imageError) {
+      } catch (imageError: any) {
         console.error("Error processing image file with sharp:", imageError);
         return {
           valid: false,
@@ -376,6 +376,7 @@ export async function validateArtwork(file: File): Promise<ValidationResult> {
             requiredHeight: REQUIRED_HEIGHT,
             requiredResolution: REQUIRED_RESOLUTION,
             suggestions: [
+              imageError?.message || "",
               "There was an error processing your image file.",
               "The file may be corrupted or in an unsupported format.",
               "Try re-saving your file in a different format like JPG or PNG."
