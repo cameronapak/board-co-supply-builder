@@ -20,6 +20,7 @@
     "astro": "^5.11.0",
     "basecoat-css": "^0.1.2",
     "bknd": "0.15.0-rc.4",
+    "pdfjs-dist": "^5.3.93",
     "tailwindcss": "^4.1.8"
   },
   "devDependencies": {

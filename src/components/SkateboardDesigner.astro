@@ -63,7 +63,7 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
         x-ref="fileInput"
         class="absolute inset-0 cursor-pointer opacity-0"
         type="file"
-        accept="image/*"
+        accept="image/*,application/pdf"
         @change="handleFileChange($event)"
         id="file-input"
       />
@@ -194,6 +194,9 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
 
 <script>
   import Alpine from "alpinejs";
+  import * as pdfjsLib from "pdfjs-dist/build/pdf";
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
   document.addEventListener("alpine:init", () => {
     Alpine.data("skateboardDesigner", function () {
@@ -226,18 +229,42 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
           });
         },
 
-        handleFileChange(event: Event) {
+        async handleFileChange(event: Event) {
           const file = (event.target as HTMLInputElement).files?.[0];
           if (!file) {
             return;
           }
 
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            this.imageUrl = e.target?.result as string;
-            this.resetAll();
-          };
-          reader.readAsDataURL(file);
+          if (file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              this.imageUrl = e.target?.result as string;
+              this.resetAll();
+            };
+            reader.readAsDataURL(file);
+          } else if (file.type === "application/pdf") {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+            const page = await pdf.getPage(1); // Get the first page
+
+            const viewport = page.getViewport({ scale: 1.5 }); // Adjust scale as needed
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d");
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            if (context) {
+              const renderContext = {
+                canvasContext: context,
+                viewport: viewport
+              };
+              await page.render(renderContext).promise;
+              this.imageUrl = canvas.toDataURL();
+              this.resetAll();
+            } else {
+              console.error("Could not get canvas context");
+            }
+          }
         },
 
         handleWheel(event: WheelEvent) {
