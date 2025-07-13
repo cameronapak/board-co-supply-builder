@@ -1,4 +1,5 @@
 import { PDFDocument } from "pdf-lib";
+import sharp from "sharp";
 
 interface ValidationResult {
   valid: boolean;
@@ -13,6 +14,26 @@ interface ValidationResult {
     fileType: string;
     suggestions: string[];
   };
+}
+
+async function resizeAndChangeDPI(fileBuffer: Buffer): Promise<Buffer | undefined> {
+  try {
+    // Get original image metadata
+    const metadata = await sharp(fileBuffer).metadata();
+
+    // Calculate scaling factor (300 DPI / 96 DPI = 3.125)
+    const scale = 300 / 96;
+    const newWidth = Math.round(metadata.width * scale);
+    const newHeight = Math.round(metadata.height * scale);
+
+    console.log(`Image resized to ${newWidth}x${newHeight} and saved with 300 DPI`);
+    return await sharp(fileBuffer)
+      .resize(newWidth, newHeight) // Resize to new dimensions
+      .withMetadata({ density: 300 }) // Set DPI to 300
+      .toBuffer();
+  } catch (err) {
+    console.error("Error processing image:", err);
+  }
 }
 
 // Function to validate artwork dimensions and resolution
@@ -177,7 +198,6 @@ export async function validateArtwork(file: File): Promise<ValidationResult> {
     // Handle PSD files
     else if (file.type === "image/vnd.adobe.photoshop") {
       console.log("Processing PSD file");
-      const { default: sharp } = await import("sharp");
       const buffer = await file.arrayBuffer();
       const img = sharp(Buffer.from(buffer));
       const metadata = await img.metadata();
@@ -264,9 +284,6 @@ export async function validateArtwork(file: File): Promise<ValidationResult> {
       });
 
       try {
-        const { default: sharp } = await import("sharp");
-        console.log("Sharp imported successfully");
-
         const buffer = await file.arrayBuffer();
         console.log("Image buffer loaded, size:", buffer.byteLength);
 
@@ -280,7 +297,7 @@ export async function validateArtwork(file: File): Promise<ValidationResult> {
           }
         }
 
-        const img = sharp(Buffer.from(buffer));
+        const img = sharp(await resizeAndChangeDPI(Buffer.from(buffer)));
         console.log("Sharp instance created");
 
         const metadata = await img.metadata();
