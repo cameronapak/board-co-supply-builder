@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from "astro/config";
+import { defineConfig, envField } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import netlify from "@astrojs/netlify";
 
@@ -11,5 +11,14 @@ export default defineConfig({
   },
   // This makes it where `/admin` and `/admin/` both work.
   trailingSlash: "ignore",
-  adapter: netlify()
+  adapter: netlify(),
+  env: {
+    schema: {
+      LIBSQL_DATABASE_URL: envField.string({ context: "server", access: "secret" }),
+      LIBSQL_DATABASE_TOKEN: envField.string({ context: "server", access: "secret" }),
+      S3_API_URL: envField.string({ context: "server", access: "secret" }),
+      S3_ACCESS_KEY: envField.string({ context: "server", access: "secret" }),
+      S3_SECRET_ACCESS_KEY: envField.string({ context: "server", access: "secret" })
+    }
+  }
 });

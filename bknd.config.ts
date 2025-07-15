@@ -1,8 +1,15 @@
 import type { AstroBkndConfig } from "bknd/adapter/astro";
 import type { APIContext } from "astro";
-import { em, entity, number, text } from "bknd/data";
+import { em, entity, number, text, libsql } from "bknd/data";
 import { secureRandomString } from "bknd/utils";
 import { syncTypes } from "bknd/plugins";
+import {
+  LIBSQL_DATABASE_TOKEN,
+  LIBSQL_DATABASE_URL,
+  S3_API_URL,
+  S3_ACCESS_KEY,
+  S3_SECRET_ACCESS_KEY
+} from "astro:env/server";
 
 const schema = em(
   {
@@ -44,17 +51,25 @@ const schema = em(
 export default {
   // we can use any libsql config, and if omitted, uses in-memory
   app: (ctx: APIContext) => ({
-    connection: {
-      url: process.env.LIBSQL_DATABASE_URL ?? "file:.astro/content.db",
-      authToken: process.env.LIBSQL_DATABASE_TOKEN
-    }
+    connection: libsql({
+      url: LIBSQL_DATABASE_URL ?? "file:.astro/content.db",
+      authToken: LIBSQL_DATABASE_TOKEN
+    })
   }),
   // an initial config is only applied if the database is empty
   initialConfig: {
     data: schema.toJSON(),
     // You must set this up in the Admin UI `/admin`
     media: {
-      enabled: true
+      enabled: true,
+      adapter: {
+        type: "s3",
+        config: {
+          access_key: S3_ACCESS_KEY,
+          secret_access_key: S3_SECRET_ACCESS_KEY,
+          url: S3_API_URL
+        }
+      }
     },
     // we're enabling auth ...
     auth: {
