@@ -1,9 +1,9 @@
 # Implementation Plan
 
-- [ ] 1. Update project dependencies and configuration
+- [-] 1. Update project dependencies and configuration
 
   - Update bknd from 0.15.0-rc.4 to 0.15.0 stable release
-  - Configure environment variables for S3_API, LIBSQL_DATABASE_URL, and LIBSQL_DATABASE_TOKEN
+  - Configure environment variables for S3_API_URL, S3_API_TOKEN, LIBSQL_DATABASE_URL, and LIBSQL_DATABASE_TOKEN
   - Update bknd configuration to support order data and file storage
   - _Requirements: 6.4_
 

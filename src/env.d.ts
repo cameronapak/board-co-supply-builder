@@ -10,7 +10,9 @@ declare global {
 }
 
 interface ImportMetaEnv {
-  readonly S3_API: string;
+  readonly S3_API_URL: string;
+  readonly S3_ACCESS_KEY: string;
+  readonly S3_SECRET_ACCESS_KEY: string;
   readonly LIBSQL_DATABASE_URL: string;
   readonly LIBSQL_DATABASE_TOKEN: string;
   readonly SQUARESPACE_API_KEY: string;

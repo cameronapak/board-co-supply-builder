@@ -1,12 +1,8 @@
 import type { AstroBkndConfig } from "bknd/adapter/astro";
 import type { APIContext } from "astro";
-import { registerLocalMediaAdapter } from "bknd/adapter/node";
 import { em, entity, number, text } from "bknd/data";
 import { secureRandomString } from "bknd/utils";
 import { syncTypes } from "bknd/plugins";
-
-// since we're running in node, we can register the local media adapter
-const local = registerLocalMediaAdapter();
 
 const schema = em(
   {
@@ -19,15 +15,29 @@ const schema = em(
     }),
     comments: entity("comments", {
       content: text()
+    }),
+    orders: entity("orders", {
+      // "id" is automatically added
+      userId: text(), // foreign key to bknd user
+      squarespaceOrderId: text(),
+      orderReference: text().required(),
+      designConfig: text(), // JSON string for design configuration
+      artworkFileId: text(), // reference to uploaded file
+      customerInfo: text(), // JSON string for customer information
+      pricing: text(), // JSON string for pricing details
+      status: text().required(), // order status
+      createdAt: text(),
+      updatedAt: text()
     })
 
     // relations and indices are defined separately.
     // the first argument are the helper functions, the second the entities.
   },
-  ({ relation, index }, { posts, comments }) => {
+  ({ relation, index }, { posts, comments, orders }) => {
     relation(comments).manyToOne(posts);
     // relation as well as index can be chained!
     index(posts).on(["title"]).on(["slug"], true);
+    index(orders).on(["userId"]).on(["squarespaceOrderId"]).on(["orderReference"], true);
   }
 );
 
@@ -35,7 +45,8 @@ export default {
   // we can use any libsql config, and if omitted, uses in-memory
   app: (ctx: APIContext) => ({
     connection: {
-      url: process.env.DB_URL ?? "file:.astro/content.db"
+      url: process.env.LIBSQL_DATABASE_URL ?? "file:.astro/content.db",
+      authToken: process.env.LIBSQL_DATABASE_TOKEN
     }
   }),
   // an initial config is only applied if the database is empty
@@ -72,13 +83,6 @@ export default {
           is_default: true
         }
       }
-    },
-    // ... and media
-    media: {
-      enabled: true,
-      adapter: local({
-        path: "./public/temp/uploads"
-      })
     }
   },
   options: {

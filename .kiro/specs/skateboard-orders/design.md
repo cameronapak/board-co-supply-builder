@@ -185,7 +185,9 @@ Using bknd.io for data persistence and file storage:
 
 **Environment Variables:**
 
-- S3_API: S3 configuration for file storage
+- S3_API_URL: S3 configuration for file storage
+  - S3_ACCESS_KEY: S3 access key
+  - S3_SECRET_ACCESS_KEY: S3 secret key
 - LIBSQL_DATABASE_URL: Database connection URL
 - LIBSQL_DATABASE_TOKEN: Database authentication token
 - SQUARESPACE_API_KEY: API key for Squarespace Commerce API authentication
