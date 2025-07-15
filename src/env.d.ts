@@ -9,4 +9,15 @@ declare global {
   }
 }
 
+interface ImportMetaEnv {
+  readonly S3_API: string;
+  readonly LIBSQL_DATABASE_URL: string;
+  readonly LIBSQL_DATABASE_TOKEN: string;
+  readonly SQUARESPACE_API_KEY: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
 export {};
