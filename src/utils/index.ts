@@ -21,18 +21,44 @@ async function resizeAndChangeDPI(fileBuffer: Buffer): Promise<Buffer | undefine
     // Get original image metadata
     const metadata = await sharp(fileBuffer).metadata();
 
-    // Calculate scaling factor (300 DPI / 96 DPI = 3.125)
-    const scale = 300 / 96;
-    const newWidth = Math.round(metadata.width * scale);
-    const newHeight = Math.round(metadata.height * scale);
+    // Safely handle potentially undefined metadata properties
+    const currentDPI = metadata.density ?? 96; // Default to 96 DPI if undefined
+    const imageWidth = metadata.width ?? 0;
+    const imageHeight = metadata.height ?? 0;
 
-    console.log(`Image resized to ${newWidth}x${newHeight} and saved with 300 DPI`);
+    // Log when using default DPI
+    if (metadata.density === undefined) {
+      console.log(`Image DPI metadata missing, assuming default ${currentDPI} DPI for processing`);
+    }
+
+    // Check if image already has 300 DPI or higher
+    if (currentDPI >= 300) {
+      console.log(`Image already at ${currentDPI} DPI (>= 300 DPI requirement), no processing needed`);
+      return fileBuffer;
+    }
+
+    // Validate that we have valid dimensions
+    if (imageWidth === 0 || imageHeight === 0) {
+      console.error("Invalid image dimensions detected");
+      return undefined;
+    }
+
+    // Calculate scaling factor based on current DPI
+    const scale = 300 / currentDPI;
+    const newWidth = Math.round(imageWidth * scale);
+    const newHeight = Math.round(imageHeight * scale);
+
+    console.log(
+      `Image resized from ${imageWidth}x${imageHeight} (${currentDPI} DPI) to ${newWidth}x${newHeight} (300 DPI)`
+    );
+
     return await sharp(fileBuffer)
       .resize(newWidth, newHeight) // Resize to new dimensions
       .withMetadata({ density: 300 }) // Set DPI to 300
       .toBuffer();
   } catch (err) {
     console.error("Error processing image:", err);
+    return undefined;
   }
 }
 
