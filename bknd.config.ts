@@ -52,6 +52,10 @@ export default {
   // an initial config is only applied if the database is empty
   initialConfig: {
     data: schema.toJSON(),
+    // You must set this up in the Admin UI `/admin`
+    media: {
+      enabled: true
+    },
     // we're enabling auth ...
     auth: {
       allow_register: true,
