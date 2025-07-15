@@ -1,6 +1,6 @@
 # Implementation Plan
 
-- [ ] 1. Update project dependencies and configuration
+- [x] 1. Update project dependencies and configuration
 
   - Update bknd from 0.15.0-rc.4 to 0.15.0 stable release
   - Configure SQUARESPACE_API_KEY environment variable
