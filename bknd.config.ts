@@ -1,6 +1,6 @@
 import type { AstroBkndConfig } from "bknd/adapter/astro";
 import type { APIContext } from "astro";
-import { em, entity, number, text, libsql } from "bknd/data";
+import { em, enumm, entity, number, text, libsql, date } from "bknd/data";
 import { secureRandomString } from "bknd/utils";
 import { syncTypes } from "bknd/plugins";
 import {
@@ -26,15 +26,18 @@ const schema = em(
     orders: entity("orders", {
       // "id" is automatically added
       userId: text(), // foreign key to bknd user
-      squarespaceOrderId: text(),
-      orderReference: text().required(),
-      designConfig: text(), // JSON string for design configuration
-      artworkFileId: text(), // reference to uploaded file
-      customerInfo: text(), // JSON string for customer information
-      pricing: text(), // JSON string for pricing details
-      status: text().required(), // order status
-      createdAt: text(),
-      updatedAt: text()
+      squarespaceOrderId: text(), // Squarespace order ID for tracking
+      orderReference: text().required(), // unique order reference
+      designConfig: text(), // JSON string for skateboard design configuration
+      artworkFileId: text(), // reference to uploaded artwork file in S3
+      customerInfo: text(), // JSON string for customer billing/shipping info
+      pricing: text(), // JSON string for pricing breakdown details
+      status: enumm({
+        enum: ["pending", "processing", "completed", "failed"],
+        default_value: "pending"
+      }).required(), // order status: pending, processing, completed, failed
+      createdAt: date(),
+      updatedAt: date()
     })
 
     // relations and indices are defined separately.
@@ -42,9 +45,17 @@ const schema = em(
   },
   ({ relation, index }, { posts, comments, orders }) => {
     relation(comments).manyToOne(posts);
-    // relation as well as index can be chained!
+    // Configure order relationships - orders belong to users
+    // Note: bknd handles user relationships automatically via userId field
+
+    // Create indexes for efficient querying
     index(posts).on(["title"]).on(["slug"], true);
-    index(orders).on(["userId"]).on(["squarespaceOrderId"]).on(["orderReference"], true);
+    index(orders)
+      .on(["userId"]) // Index for user's orders lookup
+      .on(["squarespaceOrderId"]) // Index for Squarespace integration
+      .on(["orderReference"], true) // Unique index for order reference
+      .on(["status"]) // Index for order status filtering
+      .on(["createdAt"]); // Index for chronological ordering
   }
 );
 
