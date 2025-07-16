@@ -4,12 +4,21 @@ A web application that allows customers to design custom skateboard decks by upl
 
 ## Features
 
+### Current Features
+
 - **Interactive Design Tool**: Upload and position artwork on skateboard template with real-time preview
 - **File Support**: Handles both image files and PDF artwork with validation using PDF.js and PDF-lib
-- **Order Processing**: Integrates with Squarespace Commerce API for e-commerce functionality
-- **User Management**: Authentication system with user accounts and order history
+- **User Management**: Authentication system with user accounts
 - **Admin Interface**: Backend management through Bknd admin panel
 - **Responsive Design**: Works across desktop and mobile devices
+- **Type-Safe Order System**: Comprehensive TypeScript interfaces and Zod validation schemas for order processing
+
+### In Development
+
+- **Order Processing**: Squarespace Commerce API integration for e-commerce functionality
+- **Pricing Calculator**: Real-time pricing with base costs, artwork fees, shipping, and taxes
+- **Order Management**: Customer order history and status tracking
+- **Payment Processing**: Complete checkout flow with order confirmation
 
 ## Technology Stack
 
@@ -56,9 +65,54 @@ src/
 ├── actions/            # Astro actions
 │   ├── index.ts        # Actions registry
 │   └── validate.ts     # File validation
+├── types/              # TypeScript type definitions
+│   └── orders.ts       # Order system types and validation schemas
 ├── utils/              # Shared utilities
 └── styles/             # Global CSS
 ```
+
+## Data Models
+
+### Order System Types
+
+The application includes comprehensive TypeScript interfaces and Zod validation schemas for type-safe order processing:
+
+#### Core Interfaces
+
+- **`SkateboardOrder`**: Main order entity with design configuration, customer info, pricing, and status tracking
+- **`CustomerInfo`**: Customer contact information with billing and shipping addresses
+- **`Address`**: Standardized address format for billing and shipping
+- **`OrderPricing`**: Detailed pricing breakdown including base price, artwork fees, shipping, taxes, and totals
+
+#### Squarespace API Integration Types
+
+- **`SquarespaceOrderRequest`**: Request format for creating orders via Squarespace Commerce API
+- **`SquarespaceOrderResponse`**: Response format from Squarespace order creation
+- **`SquarespaceLineItem`**: Product line items with customization support
+- **`SquarespaceAddress`**: Squarespace-specific address format
+
+#### Validation Schemas
+
+All interfaces include corresponding Zod schemas for runtime validation:
+
+- Form validation for client-side input
+- API request/response validation
+- Data transformation between internal and Squarespace formats
+
+#### Database Schema
+
+Orders are stored in the `orders` table with the following structure:
+
+- `id`: Auto-generated primary key
+- `userId`: Foreign key to authenticated user
+- `squarespaceOrderId`: Reference to Squarespace order
+- `orderReference`: Unique order reference number
+- `designConfig`: JSON string containing design parameters (zoom, pan, rotation, artwork URL)
+- `artworkFileId`: Reference to uploaded artwork file in S3 storage
+- `customerInfo`: JSON string with billing and shipping information
+- `pricing`: JSON string with detailed pricing breakdown
+- `status`: Order status (`pending`, `processing`, `completed`, `failed`)
+- `createdAt`/`updatedAt`: Timestamp tracking
 
 ## Installation
 
