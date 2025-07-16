@@ -15,29 +15,58 @@ const schema = em(
   {
     posts: entity("posts", {
       // "id" is automatically added
-      title: text().required(),
-      slug: text().required(),
-      content: text(),
-      views: number()
+      title: text({
+        label: "Title"
+      }).required(),
+      slug: text({
+        label: "Slug"
+      }).required(),
+      content: text({
+        label: "Content"
+      }),
+      views: number({
+        label: "Views"
+      })
     }),
     comments: entity("comments", {
-      content: text()
+      content: text({
+        label: "Content"
+      })
     }),
     orders: entity("orders", {
       // "id" is automatically added
-      userId: text(), // foreign key to bknd user
-      squarespaceOrderId: text(), // Squarespace order ID for tracking
-      orderReference: text().required(), // unique order reference
-      designConfig: text(), // JSON string for skateboard design configuration
-      artworkFileId: text(), // reference to uploaded artwork file in S3
-      customerInfo: text(), // JSON string for customer billing/shipping info
-      pricing: text(), // JSON string for pricing breakdown details
+      userId: text({
+        label: "User ID"
+      }), // foreign key to bknd user
+      squarespaceOrderId: text({
+        label: "Squarespace Order ID"
+      }), // Squarespace order ID for tracking
+      orderReference: text({
+        label: "Order Reference"
+      }).required(), // unique order reference
+      designConfig: text({
+        label: "Design Configuration"
+      }), // JSON string for skateboard design configuration
+      artworkFileId: text({
+        label: "Artwork File ID"
+      }), // reference to uploaded artwork file in S3
+      customerInfo: text({
+        label: "Customer Information"
+      }), // JSON string for customer billing/shipping info
+      pricing: text({
+        label: "Pricing"
+      }), // JSON string for pricing breakdown details
       status: enumm({
         enum: ["pending", "processing", "completed", "failed"],
-        default_value: "pending"
+        default_value: "pending",
+        label: "Status"
       }).required(), // order status: pending, processing, completed, failed
-      createdAt: date(),
-      updatedAt: date()
+      createdAt: date({
+        label: "Created At"
+      }),
+      updatedAt: date({
+        label: "Updated At"
+      })
     })
 
     // relations and indices are defined separately.
