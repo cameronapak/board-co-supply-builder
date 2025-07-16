@@ -1,6 +1,6 @@
 # Skateboard Deck Designer App for Board Co Supply
 
-A web application that allows customers to design custom skateboard decks by uploading artwork (images or PDFs) and positioning it on a skateboard template. The app provides an interactive design interface with zoom, pan, and rotation controls, then processes orders through Squarespace Commerce API integration.
+A web application that allows customers to design custom skateboard decks by uploading artwork (images or PDFs) and positioning it on a skateboard template. The app provides an interactive design interface with zoom, pan, and rotation controls, with order processing capabilities through Squarespace Commerce API integration.
 
 ## Features
 
@@ -8,15 +8,18 @@ A web application that allows customers to design custom skateboard decks by upl
 
 - **Interactive Design Tool**: Upload and position artwork on skateboard template with real-time preview
 - **File Support**: Handles both image files and PDF artwork with validation using PDF.js and PDF-lib
-- **User Management**: Authentication system with user accounts
-- **Admin Interface**: Backend management through Bknd admin panel
+- **User Management**: Authentication system with user accounts and secure login/registration
+- **Admin Interface**: Backend management through Bknd admin panel at `/admin`
 - **Responsive Design**: Works across desktop and mobile devices
 - **Type-Safe Order System**: Comprehensive TypeScript interfaces and Zod validation schemas for order processing
+- **Database Schema**: Complete orders table with user relationships, design configurations, and order tracking
+- **File Storage**: S3-compatible storage integration for artwork files with secure access
 
 ### In Development
 
 - **Order Processing**: Squarespace Commerce API integration for e-commerce functionality
 - **Pricing Calculator**: Real-time pricing with base costs, artwork fees, shipping, and taxes
+- **Order Form Interface**: Customer information collection with billing and shipping addresses
 - **Order Management**: Customer order history and status tracking
 - **Payment Processing**: Complete checkout flow with order confirmation
 
@@ -153,15 +156,27 @@ S3_SECRET_ACCESS_KEY="your-s3-secret-key"
 SQUARESPACE_API_KEY="your-squarespace-api-key"
 ```
 
-### Database Setup
+#### Database Setup
 
-For local development, the app uses a file-based SQLite database automatically. For production, set up a [Turso](https://turso.tech) database.
+For local development, the app uses a file-based SQLite database automatically (`.astro/content.db`). For production, set up a [Turso](https://turso.tech) database.
+
+The database schema is automatically created from the `bknd.config.ts` configuration, including:
+
+- **Users table**: Managed by Bknd authentication system
+- **Posts table**: Example content entities
+- **Comments table**: Example comment system
+- **Orders table**: Custom skateboard orders with full relationship mapping
 
 Create an admin user:
 
 ```bash
 npx tsx node_modules/.bin/bknd user create
 ```
+
+The system will automatically seed with default users:
+
+- Admin: `admin@example.com` / `password`
+- User: `user@example.com` / `password`
 
 ## Development
 
@@ -251,6 +266,47 @@ Set the following in your deployment environment:
 3. Test changes locally before submitting
 4. Update documentation for new features
 
+## Implementation Status
+
+### Completed Features ✅
+
+1. **Project Configuration**: Updated to Bknd 0.15.0 stable with proper environment variable configuration
+2. **Data Models**: Complete TypeScript interfaces and Zod validation schemas for order processing
+3. **Database Schema**: Orders table with user relationships, design configurations, and order tracking
+4. **Type Safety**: Auto-generated types from Bknd schema with comprehensive validation
+
+### In Progress 🚧
+
+The following features are currently being implemented based on the project specification:
+
+- **Database Schema Setup**: Creating orders table with bknd.io schema definition
+- **Squarespace API Integration**: API client with authentication and error handling
+- **Pricing Calculator**: Base pricing, artwork fees, shipping, and tax calculations
+- **Order Form Component**: Customer information collection with real-time validation
+- **Order Processing Actions**: Server-side validation and order creation
+- **File Storage Integration**: Artwork upload with S3 storage
+- **Order Confirmation System**: Success/error handling with order tracking
+
+### Upcoming Features 📋
+
+- **Order Management Dashboard**: User order history and status tracking
+- **Comprehensive Testing**: Unit, integration, and end-to-end test suite
+- **Performance Optimization**: Caching, lazy loading, and security enhancements
+
+## Recent Updates
+
+### Configuration Fixes
+
+- **Fixed bknd.config.ts**: Resolved import issues and date field configuration
+- **Database Schema**: Properly configured orders table with correct field types and relationships
+- **Environment Setup**: Updated for Bknd 0.15.0 stable release compatibility
+
+### Type System Improvements
+
+- **Order Types**: Complete TypeScript interfaces for skateboard orders, customer info, and pricing
+- **Squarespace Integration**: Full type definitions for API requests and responses
+- **Validation Schemas**: Zod schemas for runtime validation and form handling
+
 ## Architecture Notes
 
 - **Server-side rendering** with client-side Alpine.js hydration
@@ -258,3 +314,4 @@ Set the following in your deployment environment:
 - **Authentication** redirects to custom login/register pages
 - **File uploads** processed through Bknd with S3 storage
 - **Order processing** integrates with Squarespace Commerce API
+- **Type-safe development** with auto-generated types and comprehensive validation
