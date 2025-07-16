@@ -7,7 +7,7 @@
   - Update bknd configuration to support order data and file storage using existing libsql and S3 adapters
   - _Requirements: 6.4_
 
-- [ ] 2. Create data models and types for skateboard orders
+- [x] 2. Create data models and types for skateboard orders
 
   - Define TypeScript interfaces for SkateboardOrder, CustomerInfo, Address, and OrderPricing
   - Create Zod schemas for form validation and API request validation
