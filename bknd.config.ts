@@ -174,7 +174,7 @@ export default {
         enabled: true,
         write: async (et) => {
           // customize the location and the writer
-          await import("fs/promises").then((fs) => fs.writeFile("src/bknd-types.d.ts", et.toString()));
+          await Bun.write("src/bknd-types.d.ts", et.toString());
         }
       })
     ]
