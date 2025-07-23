@@ -29,29 +29,28 @@
 ## Development Tools
 
 - **Prettier**: Code formatting with Astro and TailwindCSS plugins
-- **Node Version Manager**: Version consistency (see .nvmrc)
 
 ## Common Commands
 
 ### Development
 
 ```bash
-npm run dev          # Start development server with asset copying
-npm run build        # Production build with asset optimization
-npm run preview      # Preview production build locally
+bun run dev          # Start development server with asset copying
+bun run build        # Production build with asset optimization
+bun run preview      # Preview production build locally
 ```
 
 ### Database Management
 
 ```bash
-npm run db:reset-local    # Reset local SQLite database
-npx tsx node_modules/.bin/bknd user create    # Create admin user
+bun run db:reset-local    # Reset local SQLite database
+bun x tsx node_modules/.bin/bknd user create    # Create admin user
 ```
 
 ### Code Quality
 
 ```bash
-npm run format       # Format code with Prettier
+bun run format       # Format code with Prettier
 ```
 
 ## Environment Configuration

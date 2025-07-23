@@ -4,7 +4,7 @@
 
 - `astro.config.mjs`: Astro framework configuration with Netlify adapter
 - `bknd.config.ts`: Backend configuration including database schema and auth
-- `package.json`: Dependencies and npm scripts
+- `package.json`: Dependencies and bun scripts
 - `tsconfig.json`: TypeScript configuration
 - `.env` / `.env.example`: Environment variables
 
