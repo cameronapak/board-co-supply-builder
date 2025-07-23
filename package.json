@@ -3,6 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
+    "update-packages": "bun update --interactive",
     "predev": "bknd copy-assets --out public/bknd --clean",
     "dev": "astro dev",
     "prebuild": "bknd copy-assets --out public/bknd --clean",
