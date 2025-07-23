@@ -22,6 +22,8 @@
   - _Requirements: 3.1, 3.2, 3.3_
 
 - [ ] 4. Test the optimized function with various image types
+     before starting check out `/src/assets/test-images`
+     and use Bun test
   - Create test cases for images already at 300+ DPI
   - Test with images at different DPI levels
   - Test with images lacking DPI metadata
