@@ -21,7 +21,7 @@
   - Add log message when DPI metadata is missing and default is used
   - _Requirements: 3.1, 3.2, 3.3_
 
-- [ ] 4. Test the optimized function with various image types
+- [x] 4. Test the optimized function with various image types
      before starting check out `/src/assets/test-images`
      and use Bun test
   - Create test cases for images already at 300+ DPI
