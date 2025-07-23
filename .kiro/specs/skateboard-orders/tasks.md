@@ -14,11 +14,12 @@
   - Define Squarespace API request/response types
   - _Requirements: 2.2, 6.3_
 
-- [ ] 3. Set up database schema for order management
+- [x] 3. Set up database schema for order management
 
-  - Create orders table with bknd.io schema definition
+  - Create orders table with bknd.io schema definition in the bknd.config.ts
   - Configure relationships between users, orders, and artwork files
-  - Set up database migrations for order tracking
+    Note: no need to set up database migrations because this
+    happens automatically through bknd
   - _Requirements: 4.4, 6.4_
 
 - [ ] 4. Implement Squarespace API integration service
