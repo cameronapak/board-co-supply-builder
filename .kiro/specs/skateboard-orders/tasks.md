@@ -22,7 +22,7 @@
     happens automatically through bknd
   - _Requirements: 4.4, 6.4_
 
-- [ ] 4. Implement Squarespace API integration service
+- [x] 4. Implement Squarespace API integration service
 
   - Create API client for Squarespace Commerce API with authentication
   - Implement order creation function with proper error handling
