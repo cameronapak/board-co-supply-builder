@@ -121,11 +121,7 @@ The OrderForm component will be a new Astro component that handles:
 
 Client-side Alpine.js component that:
 
-- Calculates base skateboard price
-- Determines artwork fees based on custom design
-- Calculates shipping costs
-- Estimates tax amounts
-- Updates totals in real-time
+- Calculates base skateboard price (this is all it needs to do, but it derives cost from the Squarespace API for that product)
 
 ### 5. Squarespace API Service
 
@@ -208,7 +204,6 @@ Using bknd.io for data persistence and file storage:
 ### Server-Side Error Handling
 
 1. **Squarespace API Errors**:
-
    - Rate limiting (429): Implement exponential backoff
    - Authentication errors (401): Log and alert administrators
    - Validation errors (400): Return specific field errors to client
