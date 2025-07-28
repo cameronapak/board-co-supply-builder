@@ -3,6 +3,8 @@ import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
 import { actions } from "astro:actions";
 
 const { data, error } = await Astro.callAction(actions.squarespace.getSkateboardProduct, {});
+
+const deckShapes = [...new Set(data?.variants.map((variant) => variant.attributes.Shape))];
 ---
 
 <div x-data="skateboardDesigner" class="grid grid-cols-2 gap-8">
@@ -80,24 +82,38 @@ const { data, error } = await Astro.callAction(actions.squarespace.getSkateboard
     </div>
 
     <!-- Pricing Section -->
-    <div class="bg-card mt-4 rounded-lg border p-4">
-      <select x-model="skateboardVariant" class="w-full rounded border p-2">
-        <option>Select a size</option>
-        {
-          data?.variants.map((variant) => (
-            <option value={variant.id}>
-              {variant.attributes.Size}" - ${variant.pricing.basePrice.value}
-            </option>
-          ))
-        }
+    <div class="bg-card mt-4 flex flex-col gap-4 rounded-lg border p-4">
+      <select x-model="shape" class="select w-full">
+        <option>Select a shape</option>
+        <optgroup label="Deck Shape">
+          {deckShapes.map((shape) => <option value={shape}>{shape}</option>)}
+        </optgroup>
       </select>
+
+      <select :disabled="!shape" x-model="skateboardVariant" class="select w-full">
+        <option>Select a size</option>
+        <optgroup label="Deck Width">
+          {
+            data?.variants
+              .sort((a, b) => a.attributes.Size - b.attributes.Size)
+              .map((variant) => (
+                <template x-if={`"${variant.attributes.Shape}" === shape`}>
+                  <option value={variant.id}>{variant.attributes.Size}"</option>
+                </template>
+              ))
+          }
+        </optgroup>
+      </select>
+
       {
         data?.variants.map((variant) => (
           <template x-if={`skateboardVariant === "${variant.id}"`}>
             <ul>
               <li>Size: {variant.attributes.Size}"</li>
-              <li>Price: ${variant.pricing.basePrice.value}</li>
-              <li># in Stock: {variant.stock.quantity}</li>
+              <li>
+                Price: ${variant.pricing.onSale ? variant.pricing.salePrice.value : variant.pricing.basePrice.value}
+              </li>
+              <li>Remaining Stock: {variant.stock.quantity}</li>
             </ul>
           </template>
         ))
@@ -245,6 +261,7 @@ const { data, error } = await Astro.callAction(actions.squarespace.getSkateboard
           containerWidth: 0,
           containerHeight: 0,
           skateboardVariant: null as Variant | null,
+          shape: "" as "Popsicle" | "Shovel",
 
           init() {
             // Get container dimensions for snap calculations

@@ -53,7 +53,8 @@ export interface Variant {
   stock: Stock;
   image: Image | null;
   attributes: Record<string, string> & {
-    "Size": string;
+    "Size": number;
+    "Shape": string;
   };
 }
 
