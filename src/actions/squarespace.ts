@@ -18,7 +18,7 @@ export const squarespace = {
           message: "Skateboard product requested was not found",
         });
       }
-      return skateboardProduct;
+      return skateboardProduct.products.at(0);
     },
   }),
 };

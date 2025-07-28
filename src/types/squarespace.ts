@@ -52,7 +52,9 @@ export interface Variant {
   pricing: Pricing;
   stock: Stock;
   image: Image | null;
-  attributes: Record<string, string>;
+  attributes: Record<string, string> & {
+    "Size": string;
+  };
 }
 
 export interface Product {
