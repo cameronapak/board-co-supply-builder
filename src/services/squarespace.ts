@@ -17,6 +17,7 @@ import type {
   SquarespaceOrderResponse,
   // SquarespaceErrorResponse
 } from '../types/orders';
+import { type Content } from "@/types/squarespace";
 
 // Squarespace API Configuration
 const SQUARESPACE_CONFIG = {
@@ -365,6 +366,32 @@ export class SquarespaceService {
       });
 
       return response as T;
+    } catch (error) {
+      console.error('Squarespace service error:', error);
+
+      if (error instanceof SquarespaceApiError) {
+        throw error;
+      }
+
+      throw new SquarespaceApiError(
+        `Failed to get products: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        0,
+        undefined,
+        false
+      );
+    }
+  }
+
+  /**
+   * Gets the skateboard product from Squarespace
+   */
+  async getProducts(): Promise<Content> {
+    try {
+      const response = await this.client.makeRequest(`/commerce/products/?type=PHYSICAL`, {
+        method: 'GET',
+      });
+
+      return response as Content;
     } catch (error) {
       console.error('Squarespace service error:', error);
 

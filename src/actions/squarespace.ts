@@ -21,4 +21,16 @@ export const squarespace = {
       return skateboardProduct.products.at(0);
     },
   }),
+
+  getAllSkateboardProducts: defineAction({
+    accept: "json",
+    handler: async () => {
+      const squarespaceService = createSquarespaceService(
+        SQUARESPACE_API_KEY,
+        SQUARESPACE_PRODUCT_ID
+      );
+      const skateboardProducts = await squarespaceService.getProducts();
+      return skateboardProducts;
+    },
+  }),
 };
