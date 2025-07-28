@@ -107,7 +107,7 @@ export class SquarespaceApiClient {
   /**
    * Makes an authenticated request to the Squarespace API with retry logic
    */
-  private async makeRequest<T>(
+  async makeRequest<T>(
     endpoint: string,
     options: RequestInit = {},
     attempt: number = 1
@@ -274,7 +274,7 @@ export class SquarespaceDataTransformer {
    */
   static transformOrderToSquarespace(
     order: SkateboardOrder,
-    productVariantId: string
+    productId: string
   ): SquarespaceOrderRequest {
     const now = new Date().toISOString();
     const orderReference = `SKATEBOARD-${Date.now()}`;
@@ -287,7 +287,7 @@ export class SquarespaceDataTransformer {
       shippingAddress: this.transformAddress(order.customer.shippingAddress),
       lineItems: [
         {
-          variantId: productVariantId,
+          variantId: productId,
           productName: 'Custom Skateboard Deck',
           quantity: 1,
           unitPricePaid: this.transformAmount(order.pricing.subtotal, order.pricing.currency),
@@ -348,11 +348,37 @@ export class SquarespaceDataTransformer {
  */
 export class SquarespaceService {
   private client: SquarespaceApiClient;
-  private productVariantId: string;
+  private productId: string;
 
-  constructor(apiKey: string, productVariantId: string) {
+  constructor(apiKey: string, productId: string) {
     this.client = new SquarespaceApiClient(apiKey);
-    this.productVariantId = productVariantId;
+    this.productId = productId;
+  }
+
+  /**
+   * Gets the skateboard product from Squarespace
+   */
+  async getProduct<T>(): Promise<T> {
+    try {
+      const response = await this.client.makeRequest(`/commerce/products/${this.productId}?type=PHYSICAL`, {
+        method: 'GET',
+      });
+
+      return response as T;
+    } catch (error) {
+      console.error('Squarespace service error:', error);
+
+      if (error instanceof SquarespaceApiError) {
+        throw error;
+      }
+
+      throw new SquarespaceApiError(
+        `Failed to get products: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        0,
+        undefined,
+        false
+      );
+    }
   }
 
   /**
@@ -367,7 +393,7 @@ export class SquarespaceService {
       // Transform internal order data to Squarespace format
       const squarespaceOrder = SquarespaceDataTransformer.transformOrderToSquarespace(
         order,
-        this.productVariantId
+        this.productId
       );
 
       // Create the order in Squarespace
@@ -393,36 +419,19 @@ export class SquarespaceService {
       );
     }
   }
-
-  /**
-   * Validates that the service is properly configured
-   */
-  async validateConfiguration(): Promise<boolean> {
-    try {
-      // We could make a simple API call to validate the configuration
-      // For now, we'll just check that we have the required credentials
-      return Boolean(this.client && this.productVariantId);
-    } catch (error) {
-      console.error('Squarespace configuration validation failed:', error);
-      return false;
-    }
-  }
 }
 
 /**
  * Factory function to create a configured Squarespace service instance
  */
-export function createSquarespaceService(): SquarespaceService {
-  const apiKey = process.env.SQUARESPACE_API_KEY;
-  const productVariantId = process.env.SQUARESPACE_PRODUCT_VARIANT_ID;
-
+export function createSquarespaceService(apiKey: string, productId: string): SquarespaceService {
   if (!apiKey) {
     throw new Error('SQUARESPACE_API_KEY environment variable is required');
   }
 
-  if (!productVariantId) {
-    throw new Error('SQUARESPACE_PRODUCT_VARIANT_ID environment variable is required');
+  if (!productId) {
+    throw new Error('SQUARESPACE_PRODUCT_ID environment variable is required');
   }
 
-  return new SquarespaceService(apiKey, productVariantId);
+  return new SquarespaceService(apiKey, productId);
 }

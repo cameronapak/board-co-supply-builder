@@ -16,10 +16,11 @@ interface ImportMetaEnv {
   readonly LIBSQL_DATABASE_URL: string;
   readonly LIBSQL_DATABASE_TOKEN: string;
   readonly SQUARESPACE_API_KEY: string;
+  readonly SQUARESPACE_PRODUCT_ID: string;
 }
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
-export {};
+export { };
