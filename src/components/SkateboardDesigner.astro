@@ -81,7 +81,8 @@ const { data, error } = await Astro.callAction(actions.squarespace.getSkateboard
 
     <!-- Pricing Section -->
     <div class="bg-card mt-4 rounded-lg border p-4">
-      <select class="w-full rounded border p-2">
+      <select x-model="skateboardVariant" class="w-full rounded border p-2">
+        <option>Select a size</option>
         {
           data?.variants.map((variant) => (
             <option value={variant.id}>
@@ -90,6 +91,17 @@ const { data, error } = await Astro.callAction(actions.squarespace.getSkateboard
           ))
         }
       </select>
+      {
+        data?.variants.map((variant) => (
+          <template x-if={`skateboardVariant === "${variant.id}"`}>
+            <ul>
+              <li>Size: {variant.attributes.Size}"</li>
+              <li>Price: ${variant.pricing.basePrice.value}</li>
+              <li># in Stock: {variant.stock.quantity}</li>
+            </ul>
+          </template>
+        ))
+      }
     </div>
 
     <div x-show="imageUrl">
@@ -209,6 +221,7 @@ const { data, error } = await Astro.callAction(actions.squarespace.getSkateboard
     import Alpine from "alpinejs";
     import * as pdfjsLib from "pdfjs-dist/build/pdf";
     import { actions } from "astro:actions";
+    import { type Variant } from "@/types/squarespace";
 
     pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
@@ -231,6 +244,7 @@ const { data, error } = await Astro.callAction(actions.squarespace.getSkateboard
           snapThreshold: 15, // pixels within which snapping occurs
           containerWidth: 0,
           containerHeight: 0,
+          skateboardVariant: null as Variant | null,
 
           init() {
             // Get container dimensions for snap calculations
