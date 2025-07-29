@@ -10,7 +10,7 @@
         "@types/bun": "^1.2.19",
         "alpinejs": "^3.14.9",
         "astro": "^5.12.2",
-        "basecoat-css": "^0.1.2",
+        "basecoat-css": "^0.3.0",
         "bknd": "^0.15.0",
         "pdf-lib": "^1.17.1",
         "pdfjs-dist": "^5.3.93",
@@ -778,7 +778,7 @@
 
     "base64-js": ["base64-js@1.5.1", "", {}, "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA=="],
 
-    "basecoat-css": ["basecoat-css@0.1.2", "", {}, "sha512-nKlo9u7rLE7POTet5rId1Q8xjzHCqGxqRJxvF6qC7DY3ZgDDtEkLCYQN23Rluk2VMg/HPqWWf4+6rS49rXLzLw=="],
+    "basecoat-css": ["basecoat-css@0.3.0", "", {}, "sha512-LUYMQCralO0zHe9uySUNGr6kuWrdiCa8CjRhxK1fBSz+uS1DOtu0sTFgBCTTT/3IzXqBiGvKOrS945+6UBIcOQ=="],
 
     "bcryptjs": ["bcryptjs@3.0.2", "", { "bin": { "bcrypt": "bin/bcrypt" } }, "sha512-k38b3XOZKv60C4E2hVsXTolJWfkGRMbILBIe2IBITXciy5bOsTKot5kDrf3ZfufQtQOUN5mXceUEpU1rTl9Uog=="],
 

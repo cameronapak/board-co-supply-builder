@@ -21,7 +21,7 @@
     "@types/bun": "^1.2.19",
     "alpinejs": "^3.14.9",
     "astro": "^5.12.2",
-    "basecoat-css": "^0.1.2",
+    "basecoat-css": "^0.3.0",
     "bknd": "^0.15.0",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^5.3.93",
