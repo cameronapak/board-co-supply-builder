@@ -1,4 +1,5 @@
 import type { AstroBkndConfig } from "bknd/adapter/astro";
+import { registerLocalMediaAdapter } from "bknd/adapter/node";
 import type { APIContext } from "astro";
 import { em, enumm, media, entity, text, libsql, date } from "bknd/data";
 import { secureRandomString } from "bknd/utils";
@@ -11,6 +12,8 @@ import {
   S3_ACCESS_KEY,
   S3_SECRET_ACCESS_KEY
 } from "astro:env/server";
+
+const local = registerLocalMediaAdapter();
 
 const schema = em(
   {
@@ -79,14 +82,16 @@ export default {
     // You must set this up in the Admin UI `/admin`
     media: {
       enabled: true,
-      adapter: {
+      adapter: import.meta.env.PROD ? {
         type: "s3",
         config: {
           access_key: S3_ACCESS_KEY,
           secret_access_key: S3_SECRET_ACCESS_KEY,
           url: S3_API_URL
         }
-      }
+      } : local({
+        path: "./public/uploads", // Files will be stored in this directory
+      })
     },
     // we're enabling auth ...
     auth: {
