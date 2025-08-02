@@ -1,4 +1,5 @@
 ---
+import Logo from "@/components/Logo.astro";
 import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
 import { actions } from "astro:actions";
 import BuySkateboardButton from "./BuySkateboardButton.astro";
@@ -62,8 +63,14 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
   </main>
 
   <aside class="flex w-full flex-col gap-4">
-    <h1 class="heading-1">Skateboard Designer</h1>
+    <div class="flex items-center gap-4">
+      <Logo class="h-[48px] w-fit" />
 
+      <h1 class="heading-1 leading-none font-bold">
+        <span class="block">Skateboard</span>
+        <span class="block">Designer</span>
+      </h1>
+    </div>
     <div x-show="!imageUrl" class="relative w-full">
       <input
         x-ref="fileInput"

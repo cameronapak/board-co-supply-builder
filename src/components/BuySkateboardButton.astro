@@ -3,7 +3,7 @@
 ---
 
 <div class="w-full" x-data="stripe">
-  <button class="btn btn-primary w-full" :disabled="!isLoaded" @click="handleClick">Purchase Custom Deck</button>
+  <button class="btn btn-primary w-full" :disabled="!isLoaded" @click="handleClick">Order Custom Deck</button>
   <dialog x-ref="stripeDialog" id="stripe-dialog" class="dialog">
     <article class="grid grid-cols-1 grid-rows-1">
       <section class="grid grid-cols-1 grid-rows-1 overflow-y-auto">
@@ -45,6 +45,11 @@
         stripeInstance: undefined as Stripe | undefined,
         sessionClientSecret: undefined as string | undefined,
         async handleClick() {
+          // Save artwork
+          // Save board order details, with artwork id
+          // Send order number to the redirect link in createPayment
+          // Redirect link must be `/success?session_id={SESSION_ID}&order_id={ORDER_ID}`
+
           if (!this.sessionClientSecret) {
             const { data, error } = await actions.stripe.createPaymentPage({});
             if (error) {
