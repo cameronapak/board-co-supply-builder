@@ -3,7 +3,11 @@
 ---
 
 <div class="w-full" x-data="stripe">
-  <button class="btn btn-primary w-full" :disabled="!isLoaded" @click="handleClick">Order Custom Deck</button>
+  <button
+    class="btn btn-primary w-full"
+    :disabled="!isLoaded || !$store.order.shape || !$store.order.skateboardVariant"
+    @click="handleClick">Order Custom Deck</button
+  >
   <dialog x-ref="stripeDialog" id="stripe-dialog" class="dialog">
     <article class="grid grid-cols-1 grid-rows-1">
       <section class="grid grid-cols-1 grid-rows-1 overflow-y-auto">

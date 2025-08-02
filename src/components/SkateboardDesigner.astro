@@ -200,7 +200,7 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
       <!-- Pricing Section -->
       <div class="flex flex-col">
         <div class="grid grid-cols-[1fr_auto] items-center gap-2 border-b py-3">
-          <select x-model="shape" class="select w-full">
+          <select x-model="$store.order.shape" class="select w-full">
             <option>Select a shape</option>
             <optgroup label="Deck Shape">
               {deckShapes.map((shape) => <option value={shape}>{shape}</option>)}
@@ -270,14 +270,14 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
         </dialog>
 
         <div class="border-b py-3">
-          <select :disabled="!shape" x-model="skateboardVariant" class="select w-full">
+          <select :disabled="!$store.order.shape" x-model="$store.order.skateboardVariant" class="select w-full">
             <option>Select a size</option>
             <optgroup label="Deck Width">
               {
                 data?.variants
                   .sort((a, b) => a.attributes.Size - b.attributes.Size)
                   .map((variant) => (
-                    <template x-if={`"${variant.attributes.Shape}" === shape`}>
+                    <template x-if={`"${variant.attributes.Shape}" === $store.order.shape`}>
                       <option value={variant.id}>{variant.attributes.Size}"</option>
                     </template>
                   ))
@@ -288,7 +288,7 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
 
         <!-- {
           data?.variants.map((variant) => (
-            <template x-if={`skateboardVariant === "${variant.id}"`}>
+            <template x-if={`$store.order.skateboardVariant === "${variant.id}"`}>
               <ul>
                 <li>Size: {variant.attributes.Size}"</li>
                 <li>
@@ -326,6 +326,11 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
     pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
     document.addEventListener("alpine:init", () => {
+      Alpine.store("order", {
+        skateboardVariant: null as Variant | null,
+        shape: "" as "Popsicle" | "Shovel"
+      });
+
       Alpine.data("skateboardDesigner", function () {
         return {
           imageUrl: "",
@@ -344,8 +349,6 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
           snapThreshold: 15, // pixels within which snapping occurs
           containerWidth: 0,
           containerHeight: 0,
-          skateboardVariant: null as Variant | null,
-          shape: "" as "Popsicle" | "Shovel",
 
           init() {
             // Get container dimensions for snap calculations
