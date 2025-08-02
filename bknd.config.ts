@@ -1,6 +1,6 @@
 import type { AstroBkndConfig } from "bknd/adapter/astro";
 import type { APIContext } from "astro";
-import { em, media, entity, text, libsql, date } from "bknd/data";
+import { em, enumm, media, entity, text, libsql, date } from "bknd/data";
 import { secureRandomString } from "bknd/utils";
 import { syncTypes } from "bknd/plugins";
 import { writeFile } from "node:fs/promises";
@@ -26,6 +26,17 @@ const schema = em(
         label: "Design Configuration"
       }), // JSON string for skateboard design configuration
       artwork: media({ virtual: true, fillable: ["update"], }),
+      status: enumm({
+        enum: [{
+          value: "pending",
+          label: "Pending"
+        }, {
+          value: "complete",
+          label: "Complete"
+        }],
+        label: "Order Status",
+        default_value: "pending"
+      }),
       createdAt: date({
         label: "Created At"
       }),
@@ -39,8 +50,8 @@ const schema = em(
   ({ relation, index }, { orders, media }) => {
     index(orders)
       .on(["userId"]) // Index for user's orders lookup
-      .on(["squarespaceOrderId"]) // Index for Squarespace integration
-      .on(["status"]) // Index for order status filtering
+      .on(["stripeOrderId"]) // Index for Stripe integration
+      .on(["status"]) // Index for status filtering
       .on(["createdAt"]); // Index for chronological ordering
 
     relation(orders).polyToMany(media, {
