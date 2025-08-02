@@ -27,9 +27,10 @@
   - Add comprehensive test suite for API integration
   - _Requirements: 4.1, 4.2, 6.1, 6.2_
 
-- [ ] 5. Create pricing calculation system
-- Calculates base skateboard price (this is all it needs to do, but it derives cost from the Squarespace API for that product)
+- [x] 5. Create pricing calculation system
+  - Calculates base skateboard price (this is all it needs to do, but it derives cost from the Squarespace API for that product)
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+  - ✅ **COMPLETED**: Created PricingService that fetches base price from Squarespace API, implemented complete pricing calculation (base price, artwork fee, shipping, tax, total), added Astro actions for frontend integration, integrated pricing display into skateboard designer component, added comprehensive error handling and validation, created full test suite with 16 passing tests, and added documentation.
 
 - [ ] 6. Build order form component
   - Create OrderForm.astro component with design preview
