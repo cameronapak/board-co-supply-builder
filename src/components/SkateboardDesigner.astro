@@ -82,220 +82,223 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
       </button>
     </div>
 
-    <!-- Pricing Section -->
-    <div class="bg-card mt-4 flex flex-col gap-4 rounded-lg border p-4">
-      <div class="grid grid-cols-[1fr_auto] items-center gap-2">
-        <select x-model="shape" class="select w-full">
-          <option>Select a shape</option>
-          <optgroup label="Deck Shape">
-            {deckShapes.map((shape) => <option value={shape}>{shape}</option>)}
-          </optgroup>
-        </select>
-
-        <button @click="$refs.deckShapeDialog.showModal()" class="text-muted-foreground">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="size-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
-            ></path>
-          </svg>
-        </button>
-
-        <!-- <img src="http://localhost:4321/api/media/file/deck-shapes.png" /> -->
-      </div>
-
-      <dialog
-        x-ref="deckShapeDialog"
-        id="dialog-deck-shape-definition"
-        class="dialog max-h-[612px] w-full sm:max-w-[425px]"
-        aria-labelledby="dialog-deck-shape-definition-title"
-        aria-describedby="dialog-deck-shape-definition-description"
-        @click="(event.target === $el) ? $el.close() : null"
-      >
-        <article>
-          <header>
-            <h2 id="dialog-deck-shape-definition-title">Deck Shapes</h2>
-            <p id="dialog-deck-shape-definition-description">Here are the two deck shapes we offer.</p>
-          </header>
-
-          <section>
-            <img src="http://localhost:4321/api/media/file/deck-shapes.png" class="max-h-[256px] rounded-xl border" />
-          </section>
-
-          <footer>
-            <button class="btn-outline" onclick="this.closest('dialog').close()">Close</button>
-          </footer>
-
-          <button type="button" aria-label="Close dialog" onclick="this.closest('dialog').close()">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="lucide lucide-x-icon lucide-x"
-            >
-              <path d="M18 6 6 18"></path>
-              <path d="m6 6 12 12"></path>
-            </svg>
-          </button>
-        </article>
-      </dialog>
-
-      <select :disabled="!shape" x-model="skateboardVariant" class="select w-full">
-        <option>Select a size</option>
-        <optgroup label="Deck Width">
-          {
-            data?.variants
-              .sort((a, b) => a.attributes.Size - b.attributes.Size)
-              .map((variant) => (
-                <template x-if={`"${variant.attributes.Shape}" === shape`}>
-                  <option value={variant.id}>{variant.attributes.Size}"</option>
-                </template>
-              ))
-          }
-        </optgroup>
-      </select>
-
-      {
-        data?.variants.map((variant) => (
-          <template x-if={`skateboardVariant === "${variant.id}"`}>
-            <ul>
-              <li>Size: {variant.attributes.Size}"</li>
-              <li>
-                Price: ${variant.pricing.onSale ? variant.pricing.salePrice.value : variant.pricing.basePrice.value}
-              </li>
-              <li>Remaining Stock: {variant.stock.quantity}</li>
-            </ul>
-          </template>
-        ))
-      }
-    </div>
-
     <div x-show="imageUrl">
       <p class="paragraph text-muted-foreground leading-tight">Drag the image to reposition it on the skateboard</p>
 
-      <div class="mt-3 flex items-center gap-3 border-b pb-3">
-        <div class="grid w-full grid-cols-[1fr_auto] gap-2">
-          <div class="flex items-center gap-2">
-            <p class="paragraph font-semibold">Zoom</p>
-            <span class="text-muted-foreground min-w-[60px] text-start" x-text="`${Math.round(zoom * 100)}%`"></span>
-          </div>
+      <section>
+        <div class="mt-3 flex items-center gap-3 border-b pb-3">
+          <div class="grid w-full grid-cols-[1fr_auto] gap-2">
+            <div class="flex items-center gap-2">
+              <p class="paragraph font-semibold">Zoom</p>
+              <span class="text-muted-foreground min-w-[60px] text-start" x-text="`${Math.round(zoom * 100)}%`"></span>
+            </div>
 
-          <div class="flex items-center gap-2">
-            <button @click="zoomOut()" class="btn-icon-outline" :disabled="zoom <= minZoom">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                color="#000000"
-                fill="none"
-              >
-                <path d="M20 12L4 12" stroke="#000000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
-                ></path>
-              </svg>
-            </button>
+            <div class="flex items-center gap-2">
+              <button @click="zoomOut()" class="btn-icon-outline" :disabled="zoom <= minZoom">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  height="24"
+                  color="#000000"
+                  fill="none"
+                >
+                  <path d="M20 12L4 12" stroke="#000000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+                  ></path>
+                </svg>
+              </button>
 
-            <button @click="zoomIn()" class="btn-icon-outline" :disabled="zoom >= maxZoom">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                color="#000000"
-                fill="none"
-              >
-                <path
-                  d="M12 4V20M20 12H4"
-                  stroke="#000000"
-                  stroke-width="3"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Rotation Controls -->
-      <div class="mt-3 flex items-center gap-3 border-b pb-3">
-        <div class="grid w-full grid-cols-[1fr_auto] gap-2">
-          <div class="flex items-center gap-2">
-            <p class="paragraph font-semibold">Rotation</p>
-            <span class="text-muted-foreground min-w-[60px] text-start" x-text="`${rotation}°`"></span>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <button @click="rotateLeft()" class="btn-icon-outline" title="Rotate 90° counter-clockwise">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                color="#000000"
-                fill="none"
-              >
-                <path
-                  d="M4 2V5.13219C4 5.42605 4.36724 5.55908 4.55527 5.33333C6.3854 3.2875 9.04499 2 12.0051 2C17.5251 2 22 6.47715 22 12C22 15.9582 19.7015 19.3793 16.367 21"
-                  stroke="#000000"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-                <path
-                  d="M11.7347 22.0001C12.2016 22.0001 12.6611 21.9688 13.1111 21.9084M2.26537 8.66675C2.15297 9.06394 2.06477 9.46536 2 9.86901M2.03457 13.5381C2.10487 13.9381 2.19644 14.3343 2.30852 14.7245M3.83292 17.9963C4.07124 18.3497 4.3296 18.69 4.6071 19.0147M7.42857 21.3607C7.78228 21.5632 8.15042 21.7464 8.53228 21.9084"
-                  stroke="#000000"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-              </svg>
-            </button>
-
-            <button @click="rotateRight()" class="btn-icon-outline" title="Rotate 90° clockwise">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                color="#000000"
-                fill="none"
-              >
-                <path
-                  d="M20 2V5.13219C20 5.42605 19.6328 5.55908 19.4447 5.33333C17.6146 3.2875 14.955 2 11.9949 2C6.47485 2 2 6.47715 2 12C2 15.9582 4.29852 19.3793 7.63298 21"
-                  stroke="#000000"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-                <path
-                  d="M12.2653 22.0001C11.7984 22.0001 11.3389 21.9688 10.8889 21.9084M21.7346 8.66675C21.847 9.06394 21.9352 9.46536 22 9.86901M21.9654 13.5381C21.8951 13.9381 21.8036 14.3343 21.6915 14.7245M20.1671 17.9963C19.9288 18.3497 19.6704 18.69 19.3929 19.0147M16.5714 21.3607C16.2177 21.5632 15.8496 21.7464 15.4677 21.9084"
-                  stroke="#000000"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-              </svg>
-            </button>
+              <button @click="zoomIn()" class="btn-icon-outline" :disabled="zoom >= maxZoom">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  height="24"
+                  color="#000000"
+                  fill="none"
+                >
+                  <path
+                    d="M12 4V20M20 12H4"
+                    stroke="#000000"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
+
+        <!-- Rotation Controls -->
+        <div class="mt-3 flex items-center gap-3 border-b pb-3">
+          <div class="grid w-full grid-cols-[1fr_auto] gap-2">
+            <div class="flex items-center gap-2">
+              <p class="paragraph font-semibold">Rotation</p>
+              <span class="text-muted-foreground min-w-[60px] text-start" x-text="`${rotation}°`"></span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button @click="rotateLeft()" class="btn-icon-outline" title="Rotate 90° counter-clockwise">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  height="24"
+                  color="#000000"
+                  fill="none"
+                >
+                  <path
+                    d="M4 2V5.13219C4 5.42605 4.36724 5.55908 4.55527 5.33333C6.3854 3.2875 9.04499 2 12.0051 2C17.5251 2 22 6.47715 22 12C22 15.9582 19.7015 19.3793 16.367 21"
+                    stroke="#000000"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                  <path
+                    d="M11.7347 22.0001C12.2016 22.0001 12.6611 21.9688 13.1111 21.9084M2.26537 8.66675C2.15297 9.06394 2.06477 9.46536 2 9.86901M2.03457 13.5381C2.10487 13.9381 2.19644 14.3343 2.30852 14.7245M3.83292 17.9963C4.07124 18.3497 4.3296 18.69 4.6071 19.0147M7.42857 21.3607C7.78228 21.5632 8.15042 21.7464 8.53228 21.9084"
+                    stroke="#000000"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                </svg>
+              </button>
+
+              <button @click="rotateRight()" class="btn-icon-outline" title="Rotate 90° clockwise">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  height="24"
+                  color="#000000"
+                  fill="none"
+                >
+                  <path
+                    d="M20 2V5.13219C20 5.42605 19.6328 5.55908 19.4447 5.33333C17.6146 3.2875 14.955 2 11.9949 2C6.47485 2 2 6.47715 2 12C2 15.9582 4.29852 19.3793 7.63298 21"
+                    stroke="#000000"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                  <path
+                    d="M12.2653 22.0001C11.7984 22.0001 11.3389 21.9688 10.8889 21.9084M21.7346 8.66675C21.847 9.06394 21.9352 9.46536 22 9.86901M21.9654 13.5381C21.8951 13.9381 21.8036 14.3343 21.6915 14.7245M20.1671 17.9963C19.9288 18.3497 19.6704 18.69 19.3929 19.0147M16.5714 21.3607C16.2177 21.5632 15.8496 21.7464 15.4677 21.9084"
+                    stroke="#000000"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pricing Section -->
+      <div class="flex flex-col">
+        <div class="grid grid-cols-[1fr_auto] items-center gap-2 border-b py-3">
+          <select x-model="shape" class="select w-full">
+            <option>Select a shape</option>
+            <optgroup label="Deck Shape">
+              {deckShapes.map((shape) => <option value={shape}>{shape}</option>)}
+            </optgroup>
+          </select>
+
+          <button @click="$refs.deckShapeDialog.showModal()" class="text-muted-foreground">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+              ></path>
+            </svg>
+          </button>
+
+          <!-- <img src="http://localhost:4321/api/media/file/deck-shapes.png" /> -->
+        </div>
+
+        <dialog
+          x-ref="deckShapeDialog"
+          id="dialog-deck-shape-definition"
+          class="dialog max-h-[612px] w-full sm:max-w-[425px]"
+          aria-labelledby="dialog-deck-shape-definition-title"
+          aria-describedby="dialog-deck-shape-definition-description"
+          @click="(event.target === $el) ? $el.close() : null"
+        >
+          <article>
+            <header>
+              <h2 id="dialog-deck-shape-definition-title">Deck Shapes</h2>
+              <p id="dialog-deck-shape-definition-description">Here are the two deck shapes we offer.</p>
+            </header>
+
+            <section>
+              <img src="http://localhost:4321/api/media/file/deck-shapes.png" class="max-h-[256px] rounded-xl border" />
+            </section>
+
+            <footer>
+              <button class="btn-outline" onclick="this.closest('dialog').close()">Close</button>
+            </footer>
+
+            <button type="button" aria-label="Close dialog" onclick="this.closest('dialog').close()">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-x-icon lucide-x"
+              >
+                <path d="M18 6 6 18"></path>
+                <path d="m6 6 12 12"></path>
+              </svg>
+            </button>
+          </article>
+        </dialog>
+
+        <div class="border-b py-3">
+          <select :disabled="!shape" x-model="skateboardVariant" class="select w-full">
+            <option>Select a size</option>
+            <optgroup label="Deck Width">
+              {
+                data?.variants
+                  .sort((a, b) => a.attributes.Size - b.attributes.Size)
+                  .map((variant) => (
+                    <template x-if={`"${variant.attributes.Shape}" === shape`}>
+                      <option value={variant.id}>{variant.attributes.Size}"</option>
+                    </template>
+                  ))
+              }
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- {
+          data?.variants.map((variant) => (
+            <template x-if={`skateboardVariant === "${variant.id}"`}>
+              <ul>
+                <li>Size: {variant.attributes.Size}"</li>
+                <li>
+                  Price: ${variant.pricing.onSale ? variant.pricing.salePrice.value : variant.pricing.basePrice.value}
+                </li>
+                <li>Remaining Stock: {variant.stock.quantity}</li>
+              </ul>
+            </template>
+          ))
+        } -->
       </div>
 
-      <div class="grid w-full grid-cols-2 gap-2 border-b py-3">
-        <button @click="resetAll()" class="btn-outline">Reset</button>
-        <button @click="resetImage()" class="btn-outline">Change Image</button>
-      </div>
+      <section class="mt-4">
+        <BuySkateboardButton />
+      </section>
 
-      <BuySkateboardButton />
+      <button @click="resetImage()" class="btn-outline mt-4 w-full">Restart</button>
 
       <!-- <script is:inline async src="https://js.stripe.com/v3/buy-button.js"></script>
 
