@@ -17,6 +17,10 @@ interface ImportMetaEnv {
   readonly LIBSQL_DATABASE_TOKEN: string;
   readonly SQUARESPACE_API_KEY: string;
   readonly SQUARESPACE_PRODUCT_ID: string;
+  /** https://docs.stripe.com/api */
+  readonly STRIPE_SECRET_KEY: string;
+  /** https://docs.stripe.com/api */
+  readonly STRIPE_SECRET_TEST_KEY: string;
 }
 
 interface ImportMeta {

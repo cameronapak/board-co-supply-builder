@@ -20,7 +20,9 @@ export default defineConfig({
       S3_ACCESS_KEY: envField.string({ context: "server", access: "secret" }),
       S3_SECRET_ACCESS_KEY: envField.string({ context: "server", access: "secret" }),
       SQUARESPACE_API_KEY: envField.string({ context: "server", access: "secret" }),
-      SQUARESPACE_PRODUCT_ID: envField.string({ context: "server", access: "secret" })
+      SQUARESPACE_PRODUCT_ID: envField.string({ context: "server", access: "secret" }),
+      STRIPE_SECRET_KEY: envField.string({ context: "server", access: "secret" }),
+      STRIPE_SECRET_TEST_KEY: envField.string({ context: "server", access: "secret" })
     }
   }
 });

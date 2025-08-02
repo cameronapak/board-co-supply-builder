@@ -1,6 +1,7 @@
 ---
 import SkateboardTemplate from "@/components/SkateboardTemplate.astro";
 import { actions } from "astro:actions";
+import BuySkateboardButton from "./BuySkateboardButton.astro";
 
 const { data, error } = await Astro.callAction(actions.squarespace.getSkateboardProduct, {});
 
@@ -293,6 +294,16 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
         <button @click="resetAll()" class="btn-outline">Reset</button>
         <button @click="resetImage()" class="btn-outline">Change Image</button>
       </div>
+
+      <BuySkateboardButton />
+
+      <!-- <script is:inline async src="https://js.stripe.com/v3/buy-button.js"></script>
+
+      <stripe-buy-button
+        buy-button-id="buy_btn_1RrjflHtvrrwAy8nNAdhFfTj"
+        publishable-key="pk_live_51L3520HtvrrwAy8nvW027UEQgwyS7BUvCFmtwxzNm9RgrtUBylLdjuXFbn1ay5kbU7HTnXLIRJI9ZChVGB8ckKHp000TZD7b9n"
+      >
+      </stripe-buy-button> -->
     </div>
   </aside>
 
@@ -335,6 +346,33 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
                 this.containerHeight = container.offsetHeight;
               }
             });
+          },
+
+          async validateStripeSession() {
+            const sessionId = new URLSearchParams(window.location.search).get("session_id");
+            if (!sessionId) {
+              return;
+            }
+
+            // Remove the session_id url param
+            const url = new URL(window.location.href);
+            url.searchParams.delete("session_id");
+            window.history.replaceState({}, "", url.toString());
+
+            // const session = await actions.stripe.validateSubscription.orThrow({ sessionId, imei: this.imei });
+            // if (!session) {
+            //   return;
+            // }
+
+            // if (session.isSubscribed) {
+            //   this.showSuccessToast("Congratulations! You're subscribed.");
+            //   this.showConfetti();
+            //   this.isSubscribed = true;
+            //   await this.addFeatureToDevice(KNOX_USER_GROUPS.SUBSCRIBED);
+            //   this.features.push(KNOX_USER_GROUPS.SUBSCRIBED);
+            // } else {
+            //   this.showErrorToast("Subscription validation failed. Please try again.");
+            // }
           },
 
           async handleFileChange(event: Event) {

@@ -1,0 +1,81 @@
+---
+
+---
+
+<div class="w-full" x-data="stripe">
+  <button class="btn btn-primary w-full" :disabled="!isLoaded" @click="handleClick">Purchase Custom Deck</button>
+  <dialog x-ref="stripeDialog" id="stripe-dialog" class="dialog">
+    <article class="grid grid-cols-1 grid-rows-1">
+      <section class="grid grid-cols-1 grid-rows-1 overflow-y-auto">
+        <div id="stripe-element"></div>
+      </section>
+
+      <button type="button" aria-label="Close dialog" onclick="this.closest('dialog').close()">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-x-icon lucide-x"
+        >
+          <path d="M18 6 6 18"></path>
+          <path d="m6 6 12 12"></path>
+        </svg>
+      </button>
+    </article>
+  </dialog>
+</div>
+
+<script>
+  import { loadStripe, type Stripe } from "@stripe/stripe-js";
+  import { actions } from "astro:actions";
+  import Alpine from "alpinejs";
+  import { STRIPE_PUBLIC_KEY } from "@/utils/constants";
+
+  document.addEventListener("alpine:init", () => {
+    Alpine.data("stripe", function () {
+      return {
+        isLoaded: false,
+        isEmbedded: false,
+        stripeInstance: undefined as Stripe | undefined,
+        sessionClientSecret: undefined as string | undefined,
+        async handleClick() {
+          if (!this.sessionClientSecret) {
+            const { data, error } = await actions.stripe.createPaymentPage({});
+            if (error) {
+              throw new Error(error.message);
+            }
+            this.sessionClientSecret = data.session.client_secret as string;
+          }
+
+          if (!this.isEmbedded) {
+            const checkout = await this.stripeInstance?.initEmbeddedCheckout({
+              clientSecret: this.sessionClientSecret
+            });
+            checkout?.mount("#stripe-element");
+            this.isEmbedded = true;
+          }
+
+          (this.$refs.stripeDialog as HTMLDialogElement).showModal();
+        },
+        async initializeStripe() {
+          const stripe = await loadStripe(STRIPE_PUBLIC_KEY);
+          if (!stripe) {
+            throw new Error("Stripe is not loaded");
+          }
+
+          this.stripeInstance = stripe;
+          this.isLoaded = true;
+        },
+        init() {
+          this.initializeStripe();
+        }
+      };
+    });
+  });
+</script>
