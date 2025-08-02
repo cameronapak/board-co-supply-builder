@@ -3,6 +3,7 @@ import type { APIContext } from "astro";
 import { em, enumm, entity, number, text, libsql, date } from "bknd/data";
 import { secureRandomString } from "bknd/utils";
 import { syncTypes } from "bknd/plugins";
+import { writeFile } from "node:fs/promises";
 import {
   LIBSQL_DATABASE_TOKEN,
   LIBSQL_DATABASE_URL,
@@ -174,7 +175,7 @@ export default {
         enabled: true,
         write: async (et) => {
           // customize the location and the writer
-          await Bun.write("src/bknd-types.d.ts", et.toString());
+          await writeFile("src/bknd-types.d.ts", et.toString());
         }
       })
     ]
