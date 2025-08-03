@@ -28,9 +28,12 @@ export const bknd = {
         updatedAt: new Date().toISOString()
       } as Orders)
 
-      console.log({
-        order
-      })
+      await api.media.uploadToEntity(
+        "orders", // entity name
+        order.id, // entity id
+        "artwork", // entity media field
+        artwork // url, file, stream
+      );
 
       return { order: order.toJSON() };
     }
