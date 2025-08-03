@@ -22,6 +22,41 @@ const schema = em(
       userId: text({
         label: "User ID"
       }), // foreign key to bknd user
+      size: enumm({
+        enum: [{
+          value: '8.0 inches',
+          label: '8.0 inches',
+        }, {
+          value: '8.125 inches',
+          label: '8.125 inches',
+        }, {
+          value: '8.25 inches',
+          label: '8.25 inches',
+        }, {
+          value: '8.375 inches',
+          label: '8.375 inches',
+        }, {
+          value: '8.5 inches',
+          label: '8.5 inches',
+        }, {
+          value: '8.75 inches',
+          label: '8.75 inches',
+        }, {
+          value: '9.0 inches',
+          label: '9.0 inches',
+        }],
+        label: "Skateboard Size",
+      }),
+      type: enumm({
+        enum: [{
+          value: "popsicle",
+          label: "Popsicle",
+        }, {
+          value: "shovel",
+          label: "Shovel"
+        }],
+        label: "Skateboard Type",
+      }),
       stripeOrderId: text({
         label: "Stripe Order ID"
       }), // Squarespace order ID for tracking
