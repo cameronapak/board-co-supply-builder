@@ -17,9 +17,7 @@ export const bknd = {
     handler: async ({ artwork, type, size, designConfig }, context) => {
       const api = await getApi(context.request.headers, { mode: "dynamic" });
 
-      // @TODO - get artwork sent in
       const order = await api.data.createOne("orders", {
-        // artwork,
         designConfig,
         status: "pending",
         type,
