@@ -11,7 +11,8 @@ export type SkateboardSize = z.infer<typeof SizeSchema>;
 const orderStore = {
   skateboardVariant: null as Variant | null,
   size: "" as SkateboardSize,
-  shape: "" as SkateboardType
+  shape: "" as SkateboardType,
+  artwork: null as File | null,
 }
 
 export type OrderStore = typeof orderStore;

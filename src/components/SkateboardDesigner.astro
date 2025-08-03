@@ -321,7 +321,7 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
     import Alpine from "alpinejs";
     import * as pdfjsLib from "pdfjs-dist/build/pdf";
     import { actions } from "astro:actions";
-    import { instantiateStore } from "@/alpine/store";
+    import { instantiateStore, getStore } from "@/alpine/store";
 
     pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
@@ -385,6 +385,10 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
             // }
           },
 
+          get store() {
+            return getStore();
+          },
+
           async handleFileChange(event: Event) {
             const file = (event.target as HTMLInputElement).files?.[0];
             if (!file) {
@@ -393,6 +397,7 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
 
             const formData = new FormData();
             formData.append("artwork", file);
+            this.store.artwork = file;
 
             try {
               const { data: validationResult, error } = await actions.validate.validateArtwork(formData);
