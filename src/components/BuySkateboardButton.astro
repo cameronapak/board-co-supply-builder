@@ -40,6 +40,7 @@
   import { actions } from "astro:actions";
   import Alpine from "alpinejs";
   import { STRIPE_PUBLIC_KEY } from "@/utils/constants";
+  import { getStore } from "@/alpine/store";
 
   document.addEventListener("alpine:init", () => {
     Alpine.data("stripe", function () {
@@ -48,9 +49,12 @@
         isEmbedded: false,
         stripeInstance: undefined as Stripe | undefined,
         sessionClientSecret: undefined as string | undefined,
+        store: getStore(),
         async handleClick() {
-          // Save artwork
-          // Save board order details, with artwork id
+          const formData = new FormData();
+          formData.append("shape", this.store.shape);
+          formData.append("size", this.store.skateboardVariant?.attributes.Size);
+          const order = actions.bknd.createOrder();
           // Send order number to the redirect link in createPayment
           // Redirect link must be `/success?session_id={SESSION_ID}&order_id={ORDER_ID}`
 

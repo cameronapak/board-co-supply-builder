@@ -28,8 +28,7 @@
     "pdfjs-dist": "^5.3.93",
     "sharp": "^0.34.3",
     "stripe": "^18.4.0",
-    "tailwindcss": "^4.1.8",
-    "zod": "^3.25.76"
+    "tailwindcss": "^4.1.8"
   },
   "devDependencies": {
     "@types/alpinejs": "^3.13.11",
