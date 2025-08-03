@@ -55,6 +55,9 @@
           formData.append("type", this.store.shape.toLocaleLowerCase());
           formData.append("size", "8.0 inches");
           formData.append("artwork", this.store.artwork as File);
+          // @TODO - add the actual skateboard data, like zoom level and also x and y coordinates,
+          // so that I can replicate user's DND of the image
+          formData.append("designConfig", JSON.stringify(this.store.skateboardVariant));
           const order = await actions.bknd.createOrder(formData);
           console.log(order);
           // Send order number to the redirect link in createPayment

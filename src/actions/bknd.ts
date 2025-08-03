@@ -14,12 +14,13 @@ export const bknd = {
       type: z.enum(["popsicle", "shovel"]),
       size: z.enum(['8.0 inches', '8.125 inches', '8.25 inches', '8.375 inches', '8.5 inches', '8.75 inches', '9.0 inches'])
     }),
-    handler: async ({ artwork, type, size }, context) => {
+    handler: async ({ artwork, type, size, designConfig }, context) => {
       const api = await getApi(context.request.headers, { mode: "dynamic" });
 
+      // @TODO - get artwork sent in
       const order = await api.data.createOne("orders", {
         // artwork,
-        designConfig: JSON.stringify({}),
+        designConfig,
         status: "pending",
         type,
         size,
