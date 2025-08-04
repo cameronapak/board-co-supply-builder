@@ -20,11 +20,10 @@ const SKATEBOARD_PRICE_ID = import.meta.env.PROD
 export const stripe = {
   createPaymentPage: defineAction({
     input: z.object({
-      // size: z.enum(['8.0"', '8.125"', '8.25"', '8.375"', '8.5"', '8.75"', '9.0"',]),
-      // type: z.enum(["Popsicle", "Shovel"]),
-      // userId: z.string(),
+      orderId: z.number(),
     }),
-    handler: async ({ }, context) => {
+    handler: async ({ orderId }, context) => {
+      console.log({ orderId })
       const returnUrl = new URL("/", context.url.origin);
 
       const session = await stripeInstance.checkout.sessions.create({
@@ -41,7 +40,7 @@ export const stripe = {
           enabled: true
         },
         // Required param replaced by Stripe, and we can't have it percent encoded
-        return_url: returnUrl.toString() + "?session_id={CHECKOUT_SESSION_ID}",
+        return_url: returnUrl.toString() + `?session_id={CHECKOUT_SESSION_ID}&order_id=${orderId}`,
         automatic_tax: { enabled: true },
         allow_promotion_codes: true
       });

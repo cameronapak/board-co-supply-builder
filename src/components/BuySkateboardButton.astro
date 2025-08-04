@@ -53,33 +53,35 @@
         async handleClick() {
           const formData = new FormData();
           formData.append("type", this.store.shape.toLocaleLowerCase());
+          // @TODO - fix the this.store.size type because it's wrong...
           formData.append("size", "8.0 inches");
           formData.append("artwork", this.store.artwork as File);
           // @TODO - add the actual skateboard data, like zoom level and also x and y coordinates,
           // so that I can replicate user's DND of the image
           formData.append("designConfig", JSON.stringify(this.store.skateboardVariant));
-          const order = await actions.bknd.createOrder(formData);
-          console.log(order);
+          const { data: orderData } = await actions.bknd.createOrder(formData);
           // Send order number to the redirect link in createPayment
           // Redirect link must be `/success?session_id={SESSION_ID}&order_id={ORDER_ID}`
 
-          // if (!this.sessionClientSecret) {
-          //   const { data, error } = await actions.stripe.createPaymentPage({});
-          //   if (error) {
-          //     throw new Error(error.message);
-          //   }
-          //   this.sessionClientSecret = data.session.client_secret as string;
-          // }
+          const orderId = orderData?.order?.id;
 
-          // if (!this.isEmbedded) {
-          //   const checkout = await this.stripeInstance?.initEmbeddedCheckout({
-          //     clientSecret: this.sessionClientSecret
-          //   });
-          //   checkout?.mount("#stripe-element");
-          //   this.isEmbedded = true;
-          // }
+          if (!this.sessionClientSecret && orderId) {
+            const { data, error } = await actions.stripe.createPaymentPage({ orderId });
+            if (error) {
+              throw new Error(error.message);
+            }
+            this.sessionClientSecret = data.session.client_secret as string;
+          }
 
-          // (this.$refs.stripeDialog as HTMLDialogElement).showModal();
+          if (!this.isEmbedded) {
+            const checkout = await this.stripeInstance?.initEmbeddedCheckout({
+              clientSecret: this.sessionClientSecret
+            });
+            checkout?.mount("#stripe-element");
+            this.isEmbedded = true;
+          }
+
+          (this.$refs.stripeDialog as HTMLDialogElement).showModal();
         },
         async initializeStripe() {
           const stripe = await loadStripe(STRIPE_PUBLIC_KEY);
