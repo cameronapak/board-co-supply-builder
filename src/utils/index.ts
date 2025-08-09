@@ -87,7 +87,9 @@ export async function validateArtwork(file: File): Promise<ValidationResult> {
       "image/jpeg",
       "image/png",
       "image/webp",
-      "image/tiff"
+      "image/tiff",
+      "image/heic",
+      "image/heif"
       // Removed GIF as it's not suitable for physical printing
     ];
 
@@ -95,7 +97,7 @@ export async function validateArtwork(file: File): Promise<ValidationResult> {
     const isAIFile = file.type === "application/postscript" && file.name?.toLowerCase().endsWith(".ai");
 
     // Check if file is an image by MIME type or file extension
-    const imageExtensions = [".jpg", ".jpeg", ".png", ".webp", ".tiff", ".tif"];
+    const imageExtensions = [".jpg", ".jpeg", ".png", ".webp", ".tiff", ".tif", ".heic", ".heif"];
     const hasImageExtension = file.name ? imageExtensions.some((ext) => file.name!.toLowerCase().endsWith(ext)) : false;
 
     const isImageFile =

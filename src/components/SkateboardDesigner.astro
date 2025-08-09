@@ -82,7 +82,7 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
         x-ref="fileInput"
         class="absolute inset-0 cursor-pointer opacity-0"
         type="file"
-        accept="image/*,application/pdf"
+        accept="image/*,application/pdf,.HEIC,.HEIF"
         @change="handleFileChange($event)"
         id="file-input"
       />
@@ -321,6 +321,7 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
     import * as pdfjsLib from "pdfjs-dist/build/pdf";
     import { actions } from "astro:actions";
     import { instantiateStore, getStore } from "@/alpine/store";
+    import { heicTo, isHeic } from "heic-to";
 
     pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
@@ -394,9 +395,34 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
               return;
             }
 
+            // Convert HEIC files to JPEG before processing
+            let processedFile = file;
+
+            if (await isHeic(file)) {
+              try {
+                // Convert to JPEG
+                const jpeg = await heicTo({
+                  blob: file,
+                  type: "image/jpeg",
+                  quality: 0.8
+                });
+
+                // Create a new File object with the converted JPEG data
+                processedFile = new File([jpeg], file.name.replace(/\.(heic|heif)$/i, ".jpg"), {
+                  type: "image/jpeg",
+                  lastModified: Date.now()
+                });
+              } catch (conversionError) {
+                console.error("HEIC conversion failed:", conversionError);
+                window.alert("Failed to convert HEIC file. Please try a different format.");
+                (this.$refs.fileInput as HTMLInputElement).value = "";
+                return;
+              }
+            }
+
             const formData = new FormData();
-            formData.append("artwork", file);
-            this.store.artwork = file;
+            formData.append("artwork", processedFile);
+            this.store.artwork = processedFile;
 
             try {
               const { data: validationResult, error } = await actions.validate.validateArtwork(formData);
@@ -427,13 +453,13 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
               return;
             }
 
-            if (file.type.startsWith("image/")) {
+            if (processedFile.type.startsWith("image/")) {
               const reader = new FileReader();
               reader.onload = (e) => {
                 this.imageUrl = e.target?.result as string;
                 this.resetAll();
               };
-              reader.readAsDataURL(file);
+              reader.readAsDataURL(processedFile);
             } else if (file.type === "application/pdf") {
               const arrayBuffer = await file.arrayBuffer();
               const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
