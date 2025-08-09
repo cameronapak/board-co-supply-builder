@@ -309,19 +309,12 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
       </section>
 
       <button @click="resetImage()" class="btn-outline mt-4 w-full">Restart</button>
-
-      <!-- <script is:inline async src="https://js.stripe.com/v3/buy-button.js"></script>
-
-      <stripe-buy-button
-        buy-button-id="buy_btn_1RrjflHtvrrwAy8nNAdhFfTj"
-        publishable-key="pk_live_51L3520HtvrrwAy8nvW027UEQgwyS7BUvCFmtwxzNm9RgrtUBylLdjuXFbn1ay5kbU7HTnXLIRJI9ZChVGB8ckKHp000TZD7b9n"
-      >
-      </stripe-buy-button> -->
     </div>
   </aside>
 
   <script>
     import Alpine from "alpinejs";
+    // @ts-expect-error - pdfjs works, but has an error
     import * as pdfjsLib from "pdfjs-dist/build/pdf";
     import { actions } from "astro:actions";
     import { instantiateStore, getStore } from "@/alpine/store";
@@ -414,6 +407,10 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
                 window.alert(alertMessage);
                 (this.$refs.fileInput as HTMLInputElement).value = ""; // Reset file input
                 return;
+              }
+
+              if (validationResult.processedFile) {
+                this.store.artwork = validationResult.processedFile;
               }
             } catch (error) {
               console.error("Validation request failed:", error);
