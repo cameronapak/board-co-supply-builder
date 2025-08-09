@@ -20,7 +20,7 @@ const SKATEBOARD_PRICE_ID = import.meta.env.PROD
 export const stripe = {
   createPaymentPage: defineAction({
     input: z.object({
-      orderId: z.number(),
+      orderId: z.string(),
     }),
     handler: async ({ orderId }, context) => {
       console.log({ orderId })

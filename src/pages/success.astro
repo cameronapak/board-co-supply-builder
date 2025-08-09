@@ -4,7 +4,7 @@ import { type Orders } from "@/bknd-types";
 import Logo from "@/components/Logo.astro";
 import Layout from "@/layouts/Layout.astro";
 
-const orderId = Number(Astro.url.searchParams.get("order_id") || 0);
+const orderId = Astro.url.searchParams.get("order_id") || "";
 const stripeSessionId = Astro.url.searchParams.get("session_id") || "";
 
 let order = null as Orders | null;
@@ -31,7 +31,9 @@ if (orderId && stripeSessionId) {
         <p class="text-lg">
           Your custom skateboard deck order has been placed. Check your email for the order receipt.
         </p>
-        <p>Order Id: {order.id}</p>
+        <div>
+          Order Id: <span class="bg-secondary block rounded-lg px-2 py-1 !select-all">{order.id}</span>
+        </div>
         <a href="https://boardcosupply.com/" target="_blank" class="btn">
           Visit Board Co Supply
         </a>

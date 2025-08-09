@@ -81,6 +81,8 @@ const schema = em(
       updatedAt: date({
         label: "Updated At"
       })
+    }, {
+      primary_format: "uuid",
     }),
 
     media: entity("media", {}),

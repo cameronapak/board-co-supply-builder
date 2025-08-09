@@ -21,7 +21,7 @@ export async function onRequest(context: APIContext, next: MiddlewareNext) {
         app.registerAdminController({
           assetsPath: "/bknd/",
           adminBasepath: "/admin",
-          logoReturnPath: "../../",
+          logoReturnPath: "/",
         });
       }
     },

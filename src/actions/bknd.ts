@@ -40,7 +40,7 @@ export const bknd = {
   attachStripeSessionIdToOrder: defineAction({
     input: z.object({
       stripeSessionId: z.string(),
-      orderId: z.number().min(1),
+      orderId: z.string(),
     }),
     handler: async ({ stripeSessionId, orderId }, context) => {
       const api = await getApi(context.request.headers, { mode: "dynamic" });
