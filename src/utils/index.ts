@@ -4,7 +4,7 @@ import sharp from "sharp";
 interface ValidationResult {
   valid: boolean;
   message: string;
-  processedFile?: File | null;
+  processedFile?: Buffer; // Added to return processed file when DPI is updated
   details?: {
     currentWidth?: number;
     currentHeight?: number;
@@ -333,13 +333,6 @@ export async function validateArtwork(file: File): Promise<ValidationResult> {
         const originalBuffer = Buffer.from(buffer);
         const processedBuffer = await resizeAndChangeDPI(originalBuffer);
         const wasProcessed = !processedBuffer.equals(originalBuffer);
-        let processedFile = null as File | null;
-        if (wasProcessed && processedBuffer) {
-          processedFile = new File([processedBuffer], "processed-artwork.jpg", {
-            type: "image/jpeg",
-            lastModified: Date.now()
-          });
-        }
 
         const img = sharp(processedBuffer);
         console.log("Sharp instance created");
@@ -396,7 +389,7 @@ export async function validateArtwork(file: File): Promise<ValidationResult> {
           return {
             valid: false,
             message: "Invalid dimensions or resolution.",
-            processedFile: wasProcessed ? processedFile : undefined,
+            processedFile: wasProcessed ? processedBuffer : undefined,
             details: {
               currentWidth: metadata.width,
               currentHeight: metadata.height,
@@ -413,7 +406,7 @@ export async function validateArtwork(file: File): Promise<ValidationResult> {
         return {
           valid: true,
           message: "File is valid.",
-          processedFile: wasProcessed ? processedFile : undefined,
+          processedFile: wasProcessed ? processedBuffer : undefined,
           details: {
             currentWidth: metadata.width,
             currentHeight: metadata.height,
