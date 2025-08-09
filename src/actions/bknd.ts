@@ -39,7 +39,7 @@ export const bknd = {
       await api.media.uploadToEntity(
         "orders", // entity name
         order.id, // entity id
-        "canvas", // entity media field
+        "artwork", // entity media field
         canvas // url, file, stream
       );
 

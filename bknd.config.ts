@@ -64,7 +64,6 @@ const schema = em(
         label: "Design Configuration"
       }), // JSON string for skateboard design configuration
       artwork: media({ virtual: true, fillable: ["update"], }),
-      canvas: media({ virtual: true, fillable: ["update"], }),
       status: enumm({
         enum: [{
           value: "pending",
@@ -97,11 +96,6 @@ const schema = em(
 
     relation(orders).polyToMany(media, {
       mappedBy: "artwork",
-      targetCardinality: 1
-    });
-
-    relation(orders).polyToMany(media, {
-      mappedBy: "canvas",
       targetCardinality: 1
     });
   }
