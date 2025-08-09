@@ -9,10 +9,13 @@ const { data, error: _error } = await Astro.callAction(actions.squarespace.getSk
 const deckShapes = [...new Set(data?.variants.map((variant) => variant.attributes.Shape))];
 ---
 
-<div x-data="skateboardDesigner" class="grid grid-cols-2 gap-8">
-  <main id="skateboard-designer" class="bg-secondary flex justify-center overflow-hidden rounded-xl border p-6">
+<div x-data="skateboardDesigner" class="gap-8 max-sm:flex max-sm:flex-col sm:grid sm:grid-cols-2">
+  <main
+    id="skateboard-designer"
+    class="bg-secondary flex justify-center overflow-hidden rounded-xl border p-6 max-sm:h-[100vw] max-sm:-rotate-90"
+  >
     <div
-      class="relative h-[512px] w-fit"
+      class="relative w-fit sm:h-[512px]"
       style="aspect-ratio: 428/1741;"
       @wheel.prevent.throttle.50ms="handleWheel($event)"
     >
@@ -537,8 +540,18 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
               currentY = event.touches[0].clientY;
             }
 
-            const deltaX = currentX - this.startX;
-            const deltaY = currentY - this.startY;
+            let deltaX = currentX - this.startX;
+            let deltaY = currentY - this.startY;
+
+            // On mobile, rotate movement -90 degrees
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+              // Swap and invert axes for -90 degree rotation
+              const rotatedDeltaX = -deltaY;
+              const rotatedDeltaY = deltaX;
+              deltaX = rotatedDeltaX;
+              deltaY = rotatedDeltaY;
+            }
 
             let newPanX = this.initialPanX + deltaX;
             let newPanY = this.initialPanY + deltaY;
