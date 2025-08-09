@@ -83,7 +83,7 @@ const schema = em(
       })
     }),
 
-    media: entity("users", {}),
+    media: entity("media", {}),
   },
   ({ relation, index }, { orders, media }) => {
     index(orders)

@@ -22,8 +22,8 @@ export const bknd = {
         status: "pending",
         type,
         size,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as Orders)
 
       await api.media.uploadToEntity(
