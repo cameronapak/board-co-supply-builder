@@ -1,7 +1,7 @@
 // board-co-supply-builder/src/actions/validate.ts
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
-import type { Orders } from "@/bknd-types";
+import { type Orders } from "@/bknd-types";
 import { getApi } from "@/bknd";
 // import { TypeSchema, SizeSchema } from "@/alpine/store";
 
@@ -55,7 +55,8 @@ export const bknd = {
     handler: async ({ stripeSessionId, orderId }, context) => {
       const api = await getApi(context.request.headers, { mode: "dynamic" });
       const { data: order, error } = await api.data.updateOne("orders", orderId, {
-        stripeOrderId: stripeSessionId
+        stripeOrderId: stripeSessionId,
+        status: "complete",
       });
 
       // For some reason, when there isn't an order to update with
