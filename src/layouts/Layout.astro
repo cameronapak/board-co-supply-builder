@@ -72,4 +72,14 @@ const { title = "Board Co Supply | Board Designer" } = Astro.props as Props;
     Alpine.plugin(collapse);
     Alpine.start();
   </script>
+
+  <script is:inline>
+    // This makes it where double tapping doesn't auto-zoom
+    // on Safari iOS.
+    // source: https://x.com/birch_js/status/1954164933958255027
+    const isWebKitTouch = !!navigator.userAgent.match(/AppleWebKit/i) && "ontouchstart" in window;
+    if (isWebKitTouch) {
+      document.addEventListener("dblclick", () => {});
+    }
+  </script>
 </html>
