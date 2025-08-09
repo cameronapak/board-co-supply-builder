@@ -7,7 +7,13 @@ import netlify from "@astrojs/netlify";
 export default defineConfig({
   output: "server",
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    // https://sharp.pixelplumbing.com/install/#vite
+    build: {
+      rollupOptions: {
+        external: ["sharp"]
+      }
+    }
   },
   // This makes it where `/admin` and `/admin/` both work.
   trailingSlash: "ignore",
