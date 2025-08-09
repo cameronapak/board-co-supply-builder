@@ -1,21 +1,22 @@
 ---
-import { getApi } from "@/bknd.ts";
+import { actions } from "astro:actions";
+import { type Orders } from "@/bknd-types";
 import Logo from "@/components/Logo.astro";
 import Layout from "@/layouts/Layout.astro";
 
-const api = await getApi(Astro.request.headers, { verify: true, mode: "dynamic" });
 const orderId = Number(Astro.url.searchParams.get("order_id") || 0);
-const stripeSessionId = Astro.url.searchParams.get("session_id");
+const stripeSessionId = Astro.url.searchParams.get("session_id") || "";
 
-const { data: order, error } = await api.data.readOne("orders", orderId);
-if (order && !order.stripeOrderId && stripeSessionId) {
-  await api.data.updateOne("orders", orderId, {
-    stripeOrderId: stripeSessionId
+let order = null as Orders | null;
+if (orderId && stripeSessionId) {
+  const { data, error: _error } = await Astro.callAction(actions.bknd.attachStripeSessionIdToOrder, {
+    orderId,
+    stripeSessionId
   });
-}
 
-if (error) {
-  console.log(error, { orderId, stripeSessionId });
+  if (data?.order) {
+    order = data.order;
+  }
 }
 ---
 

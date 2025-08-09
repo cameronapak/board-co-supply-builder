@@ -1,5 +1,5 @@
 // board-co-supply-builder/src/actions/validate.ts
-import { defineAction } from "astro:actions";
+import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
 import type { Orders } from "@/bknd-types";
 import { getApi } from "@/bknd";
@@ -35,5 +35,30 @@ export const bknd = {
 
       return { order: order.toJSON() };
     }
-  })
+  }),
+
+  attachStripeSessionIdToOrder: defineAction({
+    input: z.object({
+      stripeSessionId: z.string(),
+      orderId: z.number().min(1),
+    }),
+    handler: async ({ stripeSessionId, orderId }, context) => {
+      const api = await getApi(context.request.headers, { mode: "dynamic" });
+      const { data: order, error } = await api.data.updateOne("orders", orderId, {
+        stripeOrderId: stripeSessionId
+      });
+
+      // For some reason, when there isn't an order to update with
+      // that given id, then the error I get is something like
+      // `{ meta: { items: 0, time: 0.11, count: 0, total: 1 } }`
+      if (order?.meta?.items === 0 || error) {
+        throw new ActionError({
+          message: "Failed to attach the Stripe Session ID to the Order",
+          code: "NOT_FOUND"
+        })
+      }
+
+      return { order } as { order: Orders }
+    },
+  }),
 };
