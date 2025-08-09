@@ -1,6 +1,7 @@
 import type { AstroBkndConfig } from "bknd/adapter/astro";
+import { registerLocalMediaAdapter } from "bknd/adapter/node";
 import type { APIContext } from "astro";
-import { em, enumm, entity, number, text, libsql, date } from "bknd/data";
+import { em, enumm, media, entity, text, libsql, date } from "bknd/data";
 import { secureRandomString } from "bknd/utils";
 import { syncTypes } from "bknd/plugins";
 import { writeFile } from "node:fs/promises";
@@ -12,89 +13,102 @@ import {
   S3_SECRET_ACCESS_KEY
 } from "astro:env/server";
 
+const local = registerLocalMediaAdapter();
+
 const schema = em(
   {
-    posts: entity("posts", {
-      // "id" is automatically added
-      title: text({
-        label: "Title"
-      }).required(),
-      slug: text({
-        label: "Slug"
-      }).required(),
-      content: text({
-        label: "Content"
-      }),
-      views: number({
-        label: "Views"
-      })
-    }),
-    comments: entity("comments", {
-      content: text({
-        label: "Content"
-      })
-    }),
     orders: entity("orders", {
       // "id" is automatically added
       userId: text({
         label: "User ID"
       }), // foreign key to bknd user
-      squarespaceOrderId: text({
-        label: "Squarespace Order ID"
+      size: enumm({
+        enum: [{
+          value: '8.0 inches',
+          label: '8.0 inches',
+        }, {
+          value: '8.125 inches',
+          label: '8.125 inches',
+        }, {
+          value: '8.25 inches',
+          label: '8.25 inches',
+        }, {
+          value: '8.375 inches',
+          label: '8.375 inches',
+        }, {
+          value: '8.5 inches',
+          label: '8.5 inches',
+        }, {
+          value: '8.75 inches',
+          label: '8.75 inches',
+        }, {
+          value: '9.0 inches',
+          label: '9.0 inches',
+        }],
+        label: "Skateboard Size",
+      }),
+      type: enumm({
+        enum: [{
+          value: "popsicle",
+          label: "Popsicle",
+        }, {
+          value: "shovel",
+          label: "Shovel"
+        }],
+        label: "Skateboard Type",
+      }),
+      stripeOrderId: text({
+        label: "Stripe Order ID"
       }), // Squarespace order ID for tracking
-      orderReference: text({
-        label: "Order Reference"
-      }).required(), // unique order reference
       designConfig: text({
         label: "Design Configuration"
       }), // JSON string for skateboard design configuration
-      artworkFileId: text({
-        label: "Artwork File ID"
-      }), // reference to uploaded artwork file in S3
-      customerInfo: text({
-        label: "Customer Information"
-      }), // JSON string for customer billing/shipping info
-      pricing: text({
-        label: "Pricing"
-      }), // JSON string for pricing breakdown details
+      artwork: media({ virtual: true, fillable: ["update"], }),
       status: enumm({
-        enum: ["pending", "processing", "completed", "failed"],
-        default_value: "pending",
-        label: "Status"
-      }).required(), // order status: pending, processing, completed, failed
+        enum: [{
+          value: "pending",
+          label: "Pending"
+        }, {
+          value: "complete",
+          label: "Complete"
+        }],
+        label: "Order Status",
+        default_value: "pending"
+      }),
       createdAt: date({
         label: "Created At"
       }),
       updatedAt: date({
         label: "Updated At"
       })
-    })
+    }),
 
-    // relations and indices are defined separately.
-    // the first argument are the helper functions, the second the entities.
+    media: entity("media", {}),
   },
-  ({ relation, index }, { posts, comments, orders }) => {
-    relation(comments).manyToOne(posts);
-    // Configure order relationships - orders belong to users
-    // Note: bknd handles user relationships automatically via userId field
-
-    // Create indexes for efficient querying
-    index(posts).on(["title"]).on(["slug"], true);
+  ({ relation, index }, { orders, media }) => {
     index(orders)
       .on(["userId"]) // Index for user's orders lookup
-      .on(["squarespaceOrderId"]) // Index for Squarespace integration
-      .on(["orderReference"], true) // Unique index for order reference
-      .on(["status"]) // Index for order status filtering
+      .on(["stripeOrderId"]) // Index for Stripe integration
+      .on(["status"]) // Index for status filtering
       .on(["createdAt"]); // Index for chronological ordering
+
+    relation(orders).polyToMany(media, {
+      mappedBy: "artwork",
+      targetCardinality: 1
+    });
   }
 );
 
 export default {
   // we can use any libsql config, and if omitted, uses in-memory
   app: (ctx: APIContext) => ({
-    connection: libsql({
-      url: LIBSQL_DATABASE_URL ?? "file:.astro/content.db",
-      authToken: LIBSQL_DATABASE_TOKEN
+    ...(import.meta.env.PROD ? {
+      connection: libsql({
+        url: LIBSQL_DATABASE_URL,
+        authToken: LIBSQL_DATABASE_TOKEN
+      })
+    } : {
+      connection: { url: "file:.astro/content.db" }
     })
   }),
   // an initial config is only applied if the database is empty
@@ -103,14 +117,16 @@ export default {
     // You must set this up in the Admin UI `/admin`
     media: {
       enabled: true,
-      adapter: {
+      adapter: import.meta.env.PROD ? {
         type: "s3",
         config: {
           access_key: S3_ACCESS_KEY,
           secret_access_key: S3_SECRET_ACCESS_KEY,
           url: S3_API_URL
         }
-      }
+      } : local({
+        path: "./public/uploads", // Files will be stored in this directory
+      })
     },
     // we're enabling auth ...
     auth: {
@@ -148,25 +164,21 @@ export default {
   options: {
     // the seed option is only executed if the database was empty
     seed: async (ctx) => {
-      // create an admin user
-      await ctx.app.module.auth.createUser({
-        email: "admin@example.com",
-        password: "password",
-        role: "admin"
-      });
+      if (import.meta.env.DEV) {
+        // create an admin user
+        await ctx.app.module.auth.createUser({
+          email: "admin@example.com",
+          password: "password",
+          role: "admin"
+        });
 
-      // create a user
-      await ctx.app.module.auth.createUser({
-        email: "user@example.com",
-        password: "password",
-        role: "default"
-      });
-
-      // create some entries
-      await ctx.em.mutator("posts").insertMany([
-        { title: "First post", slug: "first-post", content: "..." },
-        { title: "Second post", slug: "second-post" }
-      ]);
+        // create a user
+        await ctx.app.module.auth.createUser({
+          email: "user@example.com",
+          password: "password",
+          role: "default"
+        });
+      }
     },
     plugins: [
       // Writes down the schema types on boot and config change,

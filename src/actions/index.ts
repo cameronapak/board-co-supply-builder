@@ -1,8 +1,11 @@
-// board-co-supply-builder/src/actions/index.ts
 import { validate } from "@/actions/validate";
 import { squarespace } from "@/actions/squarespace"
+import { stripe } from "@/actions/stripe"
+import { bknd } from "@/actions/bknd";
 
 export const server = {
   squarespace,
-  validate
+  stripe,
+  validate,
+  bknd
 };
