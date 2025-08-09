@@ -1,16 +1,33 @@
 ---
-// import { getApi } from "@/bknd.ts";
+import { getApi } from "@/bknd.ts";
+import Logo from "@/components/Logo.astro";
 import Layout from "@/layouts/Layout.astro";
 
-// const api = await getApi(Astro.request.headers, { verify: true, mode: "dynamic" });
+const api = await getApi(Astro.request.headers, { verify: true, mode: "dynamic" });
+const orderId = Number(Astro.url.searchParams.get("order_id") || 0);
+const stripeSessionId = Astro.url.searchParams.get("session_id");
 
-// const { data } = await api.data.readMany("posts");
-// const user = api.getUser();
+const { data: order, error } = await api.data.readOne("orders", orderId);
+if (order && !order.stripeOrderId && stripeSessionId) {
+  await api.data.updateOne("orders", orderId, {
+    stripeOrderId: stripeSessionId
+  });
+}
+
+if (error) {
+  console.log(error, { orderId, stripeSessionId });
+}
 ---
 
 <Layout title="Success">
   <section class="mx-auto flex max-w-xl flex-col gap-4 p-6">
-    <h1 class="text-2xl font-bold">Success</h1>
-    <p class="text-lg">Your order has been placed.</p>
+    <a href="https://boardcosupply.com/" target="_blank">
+      <Logo class="max-h-[96px]" />
+    </a>
+    <h1 class="text-2xl font-bold">Congrats!</h1>
+    <p class="text-lg">Your custom skateboard deck order has been placed. Check your email for the order receipt.</p>
+    <p>Order Id: {order.id}</p>
+    <a href="https://boardcosupply.com/" target="_blank" class="btn">Visit Board Co Supply</a>
+    <a href="/" class="btn-secondary">Back to the Deck Designer</a>
   </section>
 </Layout>

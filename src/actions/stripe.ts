@@ -24,7 +24,7 @@ export const stripe = {
     }),
     handler: async ({ orderId }, context) => {
       console.log({ orderId })
-      const returnUrl = new URL("/", context.url.origin);
+      const returnUrl = new URL("/success", context.url.origin);
 
       const session = await stripeInstance.checkout.sessions.create({
         ui_mode: "embedded",
