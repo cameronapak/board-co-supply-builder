@@ -20,14 +20,36 @@ if (error) {
 ---
 
 <Layout title="Success">
-  <section class="mx-auto flex max-w-xl flex-col gap-4 p-6">
-    <a href="https://boardcosupply.com/" target="_blank">
-      <Logo class="max-h-[96px]" />
-    </a>
-    <h1 class="text-2xl font-bold">Congrats!</h1>
-    <p class="text-lg">Your custom skateboard deck order has been placed. Check your email for the order receipt.</p>
-    <p>Order Id: {order.id}</p>
-    <a href="https://boardcosupply.com/" target="_blank" class="btn">Visit Board Co Supply</a>
-    <a href="/" class="btn-secondary">Back to the Deck Designer</a>
-  </section>
+  {
+    order && order?.meta?.items ? (
+      <section class="mx-auto flex max-w-xl flex-col gap-4 p-6">
+        <a href="https://boardcosupply.com/" target="_blank">
+          <Logo class="max-h-[96px]" />
+        </a>
+        <h1 class="text-2xl font-bold">Congrats!</h1>
+        <p class="text-lg">
+          Your custom skateboard deck order has been placed. Check your email for the order receipt.
+        </p>
+        <p>Order Id: {order.id}</p>
+        <a href="https://boardcosupply.com/" target="_blank" class="btn">
+          Visit Board Co Supply
+        </a>
+        <a href="/" class="btn-secondary">
+          Back to the Deck Designer
+        </a>
+      </section>
+    ) : (
+      <section class="mx-auto flex max-w-xl flex-col gap-4 p-6">
+        <a href="https://boardcosupply.com/" target="_blank">
+          <Logo class="max-h-[96px]" />
+        </a>
+        <h1 class="text-2xl font-bold">Whoops...</h1>
+        <p>Something went wrong with your order.</p>
+        <p>Please contact Board Co Supply at (214) 906-1130</p>
+        <a href="/" class="btn-secondary">
+          Back to the Deck Designer
+        </a>
+      </section>
+    )
+  }
 </Layout>
