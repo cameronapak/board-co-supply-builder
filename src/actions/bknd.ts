@@ -1,7 +1,7 @@
 // board-co-supply-builder/src/actions/validate.ts
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
-import { type Orders } from "@/bknd-types";
+import type { Orders } from "@/bknd-types";
 import { getApi } from "@/bknd";
 // import { TypeSchema, SizeSchema } from "@/alpine/store";
 
