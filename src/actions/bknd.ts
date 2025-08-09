@@ -10,11 +10,12 @@ export const bknd = {
     accept: "form",
     input: z.object({
       artwork: z.instanceof(File),
+      canvas: z.instanceof(File),
       designConfig: z.string().optional(),
       type: z.enum(["popsicle", "shovel"]),
       size: z.enum(['8.0 inches', '8.125 inches', '8.25 inches', '8.375 inches', '8.5 inches', '8.75 inches', '9.0 inches'])
     }),
-    handler: async ({ artwork, type, size, designConfig }, context) => {
+    handler: async ({ artwork, type, size, designConfig, canvas }, context) => {
       const api = await getApi(context.request.headers, { mode: "dynamic" });
 
       const order = await api.data.createOne("orders", {
@@ -26,11 +27,20 @@ export const bknd = {
         updatedAt: new Date(),
       } as Orders)
 
+      // Original Artwork
       await api.media.uploadToEntity(
         "orders", // entity name
         order.id, // entity id
         "artwork", // entity media field
         artwork // url, file, stream
+      );
+
+      // Rendered Canvas Artwork
+      await api.media.uploadToEntity(
+        "orders", // entity name
+        order.id, // entity id
+        "canvas", // entity media field
+        canvas // url, file, stream
       );
 
       return { order: order.toJSON() };

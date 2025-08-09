@@ -25,7 +25,7 @@
     "astro": "^5.12.8",
     "basecoat-css": "^0.3.0",
     "bknd": "^0.15.0",
-    "html2canvas": "^1.4.1",
+    "html2canvas-pro": "^1.5.11",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^5.3.93",
     "sharp": "^0.34.3",

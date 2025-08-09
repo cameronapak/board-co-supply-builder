@@ -6,7 +6,7 @@
   <button
     class="btn btn-primary w-full"
     :disabled="!isLoaded || !$store.order.shape || !$store.order.skateboardVariant"
-    @click="handleClick">Order Custom Deck</button
+    @click="handleSaveDataAndStartOrder">Order Custom Deck</button
   >
   <dialog x-ref="stripeDialog" id="stripe-dialog" class="dialog">
     <article class="grid grid-cols-1 grid-rows-1">
@@ -39,6 +39,7 @@
   import { loadStripe, type Stripe } from "@stripe/stripe-js";
   import { actions } from "astro:actions";
   import Alpine from "alpinejs";
+  import html2canvas from "html2canvas-pro";
   import { STRIPE_PUBLIC_KEY } from "@/utils/constants";
   import { getStore } from "@/alpine/store";
 
@@ -50,7 +51,28 @@
         stripeInstance: undefined as Stripe | undefined,
         sessionClientSecret: undefined as string | undefined,
         store: getStore(),
-        async handleClick() {
+
+        async getSkateboardTemplateWithArtworkImage() {
+          const skateboardDesignerEl = document.querySelector("#skateboard-designer") as HTMLElement;
+          const canvas = await html2canvas(skateboardDesignerEl, {
+            backgroundColor: null,
+            scale: 4, // Increase scale for higher resolution
+            useCORS: true, // Enable CORS for better image quality
+            allowTaint: true, // Allow cross-origin images
+            logging: false, // Disable logging for better performance
+            imageTimeout: 0 // Remove timeout for image loading
+          });
+          const blob = (await new Promise((resolve) => canvas.toBlob(resolve, "image/png"))) as Blob | null;
+          if (!blob) {
+            return null;
+          }
+
+          const file = new File([blob], crypto.randomUUID(), { type: "image/png" });
+          return file;
+        },
+
+        async handleSaveDataAndStartOrder() {
+          const skateboardCanvasImg = await this.getSkateboardTemplateWithArtworkImage();
           const formData = new FormData();
           formData.append("type", this.store.shape.toLocaleLowerCase());
           // @TODO - fix the this.store.size type because it's wrong...
@@ -59,6 +81,7 @@
           // @TODO - add the actual skateboard data, like zoom level and also x and y coordinates,
           // so that I can replicate user's DND of the image
           formData.append("designConfig", JSON.stringify(this.store.skateboardVariant));
+          formData.append("canvas", skateboardCanvasImg as File);
           const { data: orderData } = await actions.bknd.createOrder(formData);
           // Send order number to the redirect link in createPayment
           // Redirect link must be `/success?session_id={SESSION_ID}&order_id={ORDER_ID}`
