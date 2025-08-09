@@ -64,6 +64,7 @@ const schema = em(
         label: "Design Configuration"
       }), // JSON string for skateboard design configuration
       artwork: media({ virtual: true, fillable: ["update"], }),
+      canvas: media({ virtual: true, fillable: ["update"], }),
       status: enumm({
         enum: [{
           value: "pending",
@@ -82,7 +83,13 @@ const schema = em(
         label: "Updated At"
       })
     }, {
-      primary_format: "uuid",
+      /**
+       *  @TODO - Figure out why I was having an issue uploading
+       * http://localhost:4321/api/media/entity/orders/01989028-c3f5-738b-a70f-613ee0541e2e/artwork?
+       * It'd throw an error saying:
+       * "Upload failed with code 404: Entity "orders" with ID "1989028" doesn't exist found"
+       **/
+      // primary_format: "uuid",
     }),
 
     media: entity("media", {}),
@@ -96,6 +103,11 @@ const schema = em(
 
     relation(orders).polyToMany(media, {
       mappedBy: "artwork",
+      targetCardinality: 1
+    });
+
+    relation(orders).polyToMany(media, {
+      mappedBy: "canvas",
       targetCardinality: 1
     });
   }

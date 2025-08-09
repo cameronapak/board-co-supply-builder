@@ -39,7 +39,7 @@ export const bknd = {
       await api.media.uploadToEntity(
         "orders", // entity name
         order.id, // entity id
-        "artwork", // entity media field
+        "canvas", // entity media field
         canvas // url, file, stream
       );
 
@@ -50,7 +50,7 @@ export const bknd = {
   attachStripeSessionIdToOrder: defineAction({
     input: z.object({
       stripeSessionId: z.string(),
-      orderId: z.string(),
+      orderId: z.number(),
     }),
     handler: async ({ stripeSessionId, orderId }, context) => {
       const api = await getApi(context.request.headers, { mode: "dynamic" });

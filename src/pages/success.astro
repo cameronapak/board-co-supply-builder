@@ -4,7 +4,7 @@ import { type Orders } from "@/bknd-types";
 import Logo from "@/components/Logo.astro";
 import Layout from "@/layouts/Layout.astro";
 
-const orderId = Astro.url.searchParams.get("order_id") || "";
+const orderId = Number(Astro.url.searchParams.get("order_id") || "0");
 const stripeSessionId = Astro.url.searchParams.get("session_id") || "";
 
 let order = null as Orders | null;
