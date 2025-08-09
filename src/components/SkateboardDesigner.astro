@@ -10,7 +10,7 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
 ---
 
 <div x-data="skateboardDesigner" class="grid grid-cols-2 gap-8">
-  <main class="bg-secondary flex justify-center overflow-hidden rounded-xl border p-6">
+  <main id="skateboard-designer" class="bg-secondary flex justify-center overflow-hidden rounded-xl border p-6">
     <div
       class="relative h-[512px] w-fit"
       style="aspect-ratio: 428/1741;"
@@ -410,7 +410,12 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
               }
 
               if (validationResult.processedFile) {
-                this.store.artwork = validationResult.processedFile;
+                let processedFile =
+                  new File([validationResult.processedFile], "processed-artwork.jpg", {
+                    type: "image/jpeg",
+                    lastModified: Date.now()
+                  }) || null;
+                this.store.artwork = processedFile;
               }
             } catch (error) {
               console.error("Validation request failed:", error);
