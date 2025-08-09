@@ -4,6 +4,7 @@ import sharp from "sharp";
 interface ValidationResult {
   valid: boolean;
   message: string;
+  processedFile?: Buffer; // Added to return processed file when DPI is updated
   details?: {
     currentWidth?: number;
     currentHeight?: number;
@@ -16,7 +17,7 @@ interface ValidationResult {
   };
 }
 
-async function resizeAndChangeDPI(fileBuffer: Buffer): Promise<Buffer | undefined> {
+async function resizeAndChangeDPI(fileBuffer: Buffer): Promise<Buffer> {
   try {
     // Get original image metadata
     const metadata = await sharp(fileBuffer).metadata();
@@ -40,7 +41,7 @@ async function resizeAndChangeDPI(fileBuffer: Buffer): Promise<Buffer | undefine
     // Validate that we have valid dimensions
     if (imageWidth === 0 || imageHeight === 0) {
       console.error("Invalid image dimensions detected");
-      return undefined;
+      return fileBuffer;
     }
 
     // Calculate scaling factor based on current DPI
@@ -58,7 +59,7 @@ async function resizeAndChangeDPI(fileBuffer: Buffer): Promise<Buffer | undefine
       .toBuffer();
   } catch (err) {
     console.error("Error processing image:", err);
-    return undefined;
+    return fileBuffer;
   }
 }
 
@@ -323,7 +324,17 @@ export async function validateArtwork(file: File): Promise<ValidationResult> {
           }
         }
 
-        const img = sharp(await resizeAndChangeDPI(Buffer.from(buffer)));
+        // Get original metadata first to check if DPI processing is needed
+        const originalImg = sharp(Buffer.from(buffer));
+        const originalMetadata = await originalImg.metadata();
+        const originalDPI = originalMetadata.density ?? 96;
+
+        // Process the image (potentially updating DPI)
+        const originalBuffer = Buffer.from(buffer);
+        const processedBuffer = await resizeAndChangeDPI(originalBuffer);
+        const wasProcessed = !processedBuffer.equals(originalBuffer);
+
+        const img = sharp(processedBuffer);
         console.log("Sharp instance created");
 
         const metadata = await img.metadata();
@@ -331,7 +342,9 @@ export async function validateArtwork(file: File): Promise<ValidationResult> {
           width: metadata.width,
           height: metadata.height,
           format: metadata.format,
-          density: metadata.density
+          density: metadata.density,
+          wasProcessed,
+          originalDPI
         });
 
         if (!metadata.width || !metadata.height) {
@@ -376,6 +389,7 @@ export async function validateArtwork(file: File): Promise<ValidationResult> {
           return {
             valid: false,
             message: "Invalid dimensions or resolution.",
+            processedFile: wasProcessed ? processedBuffer : undefined,
             details: {
               currentWidth: metadata.width,
               currentHeight: metadata.height,
@@ -392,6 +406,7 @@ export async function validateArtwork(file: File): Promise<ValidationResult> {
         return {
           valid: true,
           message: "File is valid.",
+          processedFile: wasProcessed ? processedBuffer : undefined,
           details: {
             currentWidth: metadata.width,
             currentHeight: metadata.height,
@@ -403,7 +418,8 @@ export async function validateArtwork(file: File): Promise<ValidationResult> {
             suggestions: [
               "Your artwork meets all requirements!",
               `Current size: ${metadata.width}x${metadata.height}px`,
-              metadata.density ? `Current resolution: ${metadata.density} DPI` : ""
+              metadata.density ? `Current resolution: ${metadata.density} DPI` : "",
+              wasProcessed ? `DPI was automatically updated from ${originalDPI} to ${metadata.density}` : ""
             ].filter(Boolean)
           }
         };
