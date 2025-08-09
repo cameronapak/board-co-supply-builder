@@ -28,6 +28,7 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
       <!-- Background layer - full image with reduced opacity (always visible) -->
       <div
         x-show="imageUrl"
+        x-cloak
         class="absolute top-0 right-0 bottom-0 left-0 z-5 cursor-move"
         @mousedown="startPan($event)"
         @touchstart="startPan($event)"
@@ -44,6 +45,7 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
       <!-- Clipped layer - full opacity image only within skateboard bounds -->
       <div
         x-show="imageUrl"
+        x-cloak
         class="absolute top-0 right-0 bottom-0 left-0 z-10 cursor-move"
         style="clip-path: url(#skateboard-clip);"
         @mousedown="startPan($event)"
@@ -71,6 +73,7 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
         <span class="block">Designer</span>
       </h1>
     </div>
+
     <div x-show="!imageUrl" class="relative w-full">
       <input
         x-ref="fileInput"
@@ -89,7 +92,7 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
       </button>
     </div>
 
-    <div x-show="imageUrl">
+    <div x-show="imageUrl" x-cloak x-collapse>
       <p class="paragraph text-muted-foreground leading-tight">Drag the image to reposition it on the skateboard</p>
 
       <section>

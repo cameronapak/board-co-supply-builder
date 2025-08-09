@@ -62,12 +62,14 @@ const { title = "Board Co Supply | Board Designer" } = Astro.props as Props;
 
   {/* AlpineJS */}
   <script>
-    // @ts-ignore - No up to date types for this package
     import Alpine from "alpinejs";
+    // @ts-expect-error - No types
+    import collapse from "@alpinejs/collapse";
     // @ts-ignore - No types for this package
     import ajax from "@imacrayon/alpine-ajax";
     window.Alpine = Alpine;
     Alpine.plugin(ajax);
+    Alpine.plugin(collapse);
     Alpine.start();
   </script>
 </html>
