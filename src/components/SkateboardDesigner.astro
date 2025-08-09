@@ -9,12 +9,13 @@ const { data, error: _error } = await Astro.callAction(actions.squarespace.getSk
 const deckShapes = [...new Set(data?.variants.map((variant) => variant.attributes.Shape))];
 ---
 
-<div x-data="skateboardDesigner" class="gap-8 max-sm:flex max-sm:flex-col sm:grid sm:grid-cols-2">
+<div x-data="skateboardDesigner" class="gap-8 max-sm:grid max-sm:grid-rows-[136px_auto] sm:grid sm:grid-cols-2">
   <main
-    id="skateboard-designer"
-    class="bg-secondary flex justify-center overflow-hidden rounded-xl border p-6 max-sm:h-[100vw] max-sm:-rotate-90"
+    style="aspect-ratio: 248/572;"
+    class="bg-secondary flex justify-center overflow-hidden rounded-xl border p-6 max-sm:h-[calc(100vw-6*4px*2)] max-sm:w-fit max-sm:translate-x-[25vw] max-sm:-translate-y-[25vw] max-sm:-rotate-90"
   >
     <div
+      id="skateboard-designer"
       class="relative h-full w-auto sm:h-[512px]"
       style="aspect-ratio: 428/1741;"
       @wheel.prevent.throttle.50ms="handleWheel($event)"
