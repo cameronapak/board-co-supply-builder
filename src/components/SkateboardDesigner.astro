@@ -15,7 +15,7 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
     class="bg-secondary flex justify-center overflow-hidden rounded-xl border p-6 max-sm:h-[100vw] max-sm:-rotate-90"
   >
     <div
-      class="relative w-fit sm:h-[512px]"
+      class="relative h-full w-auto sm:h-[512px]"
       style="aspect-ratio: 428/1741;"
       @wheel.prevent.throttle.50ms="handleWheel($event)"
     >
