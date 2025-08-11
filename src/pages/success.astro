@@ -17,6 +17,11 @@ if (orderId && stripeSessionId) {
   if (data?.order) {
     order = data.order;
   }
+
+  const session = await Astro.callAction(actions.stripe.getSesssionFromId, { id: stripeSessionId });
+  console.log({ session });
+
+  // @TODO - Send email to Darrin and send email to customer
 }
 ---
 
