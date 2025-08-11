@@ -14,8 +14,14 @@ export const email = {
     handler: async ({ to, subject, body }) => {
       const plunk = new Plunk(PLUNK_EMAIL_API_KEY);
 
+      // I want to receive these emails if running on dev.
+      let toAddress = 'cameronandrewpak@gmail.com';
+      if (import.meta.env.PROD) {
+        toAddress = to;
+      }
+
       const { success } = await plunk.emails.send({
-        to,
+        to: toAddress,
         subject,
         body
       })
