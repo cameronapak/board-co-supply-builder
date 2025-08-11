@@ -19,6 +19,8 @@ interface ImportMetaEnv {
   readonly STRIPE_SECRET_KEY: string;
   /** https://docs.stripe.com/api */
   readonly STRIPE_SECRET_TEST_KEY: string;
+  /** https://app.useplunk.com/settings/api */
+  readonly PLUNK_EMAIL_API_KEY: string;
 }
 
 interface ImportMeta {
