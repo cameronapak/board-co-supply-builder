@@ -4,8 +4,7 @@ import Plunk from '@plunk/node';
 import { PLUNK_EMAIL_API_KEY } from "astro:env/server";
 
 export const email = {
-  validateArtwork: defineAction({
-    accept: "form",
+  send: defineAction({
     input: z.object({
       to: z.string().email(),
       subject: z.string(),

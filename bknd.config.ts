@@ -1,7 +1,7 @@
 import type { AstroBkndConfig } from "bknd/adapter/astro";
 import { registerLocalMediaAdapter } from "bknd/adapter/node";
 import type { APIContext } from "astro";
-import { em, enumm, media, entity, text, libsql, date } from "bknd";
+import { em, enumm, media, entity, text, libsql, boolean, date } from "bknd/data";
 import { syncTypes } from "bknd/plugins";
 import { writeFile } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
@@ -76,6 +76,7 @@ const schema = em(
         label: "Order Status",
         default_value: "pending"
       }),
+      emailSent: boolean({ default_value: false }),
       createdAt: date({
         label: "Created At"
       }),

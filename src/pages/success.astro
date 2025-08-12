@@ -18,10 +18,18 @@ if (orderId && stripeSessionId) {
     order = data.order;
   }
 
-  const session = await Astro.callAction(actions.stripe.getSesssionFromId, { id: stripeSessionId });
-  console.log({ session });
+  if (!order?.emailSent) {
+    const { data: sessionData, error } = await Astro.callAction(actions.stripe.getSesssionFromId, {
+      id: stripeSessionId
+    });
 
-  // @TODO - Send email to Darrin and send email to customer
+    const customerEmail = sessionData?.session?.customer_details?.email || "";
+    if (customerEmail) {
+      // @TODO - Send email to Darrin and send email to customer
+      await Astro.callAction(actions.email.send, { to: customerEmail, subject: "TESTSKATEBOARD", body: "TEST" });
+      await Astro.callAction(actions.bknd.markEmailSentOnUpdate, { orderId });
+    }
+  }
 }
 ---
 
