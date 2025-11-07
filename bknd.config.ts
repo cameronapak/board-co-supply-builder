@@ -1,10 +1,10 @@
 import type { AstroBkndConfig } from "bknd/adapter/astro";
 import { registerLocalMediaAdapter } from "bknd/adapter/node";
 import type { APIContext } from "astro";
-import { em, enumm, media, entity, text, libsql, date } from "bknd/data";
-import { secureRandomString } from "bknd/utils";
+import { em, enumm, media, entity, text, libsql, date } from "bknd";
 import { syncTypes } from "bknd/plugins";
 import { writeFile } from "node:fs/promises";
+import { randomBytes } from "node:crypto";
 import {
   LIBSQL_DATABASE_TOKEN,
   LIBSQL_DATABASE_URL,
@@ -126,7 +126,7 @@ export default {
     })
   }),
   // an initial config is only applied if the database is empty
-  initialConfig: {
+  config: {
     data: schema.toJSON(),
     // You must set this up in the Admin UI `/admin`
     media: {
@@ -148,7 +148,7 @@ export default {
       enabled: true,
       jwt: {
         issuer: "bknd-astro-example",
-        secret: secureRandomString(64)
+        secret: randomBytes(64).toString("hex")
       },
       guard: {
         enabled: true
