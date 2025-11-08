@@ -1,7 +1,7 @@
 {
-  "name": "freedom-stack-v2",
+  "name": "board-co-supply-builder",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "scripts": {
     "update-packages": "bun update --interactive",
     "predev": "bknd copy-assets --out public/bknd --clean",
