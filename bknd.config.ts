@@ -1,19 +1,10 @@
 import type { AstroBkndConfig } from "bknd/adapter/astro";
-import { registerLocalMediaAdapter } from "bknd/adapter/node";
 import type { APIContext } from "astro";
 import { em, enumm, medium, entity, systemEntity, text, libsql, boolean, date } from "bknd";
 import { resendEmail } from "bknd";
 import { randomBytes } from "node:crypto";
-import {
-  LIBSQL_DATABASE_TOKEN,
-  LIBSQL_DATABASE_URL,
-  S3_API_URL,
-  S3_ACCESS_KEY,
-  S3_SECRET_ACCESS_KEY,
-  RESEND_API_KEY
-} from "astro:env/server";
-
-const local = registerLocalMediaAdapter();
+import { type CodeMode, code } from "bknd/modes";
+import { writer } from "bknd/adapter/node";
 
 const schema = em(
   {
@@ -115,17 +106,14 @@ const schema = em(
   }
 );
 
-export default {
+/** @see https://docs.bknd.io/usage/introduction/#code-only-mode */
+const config = {
   // we can use any libsql config, and if omitted, uses in-memory
   app: (ctx: APIContext) => ({
-    ...(import.meta.env.PROD ? {
-      connection: libsql({
-        url: LIBSQL_DATABASE_URL,
-        authToken: LIBSQL_DATABASE_TOKEN
-      })
-    } : {
-      connection: { url: "file:.astro/content.db" }
-    }),
+    connection: libsql({
+      url: process.env.LIBSQL_DATABASE_URL || "",
+      authToken: process.env.LIBSQL_DATABASE_TOKEN || ""
+    })
   }),
   // an initial config is only applied if the database is empty
   config: {
@@ -133,16 +121,14 @@ export default {
     // You must set this up in the Admin UI `/admin`
     media: {
       enabled: true,
-      adapter: import.meta.env.PROD ? {
+      adapter: {
         type: "s3",
         config: {
-          access_key: S3_ACCESS_KEY,
-          secret_access_key: S3_SECRET_ACCESS_KEY,
-          url: S3_API_URL
+          access_key: process.env.S3_ACCESS_KEY || "",
+          secret_access_key: process.env.S3_SECRET_ACCESS_KEY || "",
+          url: process.env.S3_API_URL || ""
         }
-      } : local({
-        path: "./public/uploads", // Files will be stored in this directory
-      })
+      }
     },
     // we're enabling auth ...
     auth: {
@@ -180,7 +166,7 @@ export default {
   options: {
     // the seed option is only executed if the database was empty
     seed: async (ctx) => {
-      if (import.meta.env.DEV) {
+      if (process.env.NODE_ENV === "development") {
         // create an admin user
         await ctx.app.module.auth.createUser({
           email: "admin@example.com",
@@ -197,7 +183,17 @@ export default {
       }
     },
     drivers: {
-      email: resendEmail({ apiKey: RESEND_API_KEY }),
+      email: resendEmail({ apiKey: process.env.RESEND_API_KEY || "" }),
     },
+    mode: "code",
   },
-} satisfies AstroBkndConfig<APIContext>;
+  writer,
+  typesFilePath: "src/bknd-types.d.ts",
+  isProduction: process.env?.PROD === "true",
+  syncSchema: {
+    force: true,
+    drop: true,
+  },
+} satisfies CodeMode<AstroBkndConfig<APIContext>>;
+
+export default code(config);
