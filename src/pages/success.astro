@@ -3,6 +3,7 @@ import { actions } from "astro:actions";
 import { type Orders } from "@/bknd-types";
 import Logo from "@/components/Logo.astro";
 import Layout from "@/layouts/Layout.astro";
+import { getApp } from "@/bknd";
 
 const orderId = Number(Astro.url.searchParams.get("order_id") || "0");
 const stripeSessionId = Astro.url.searchParams.get("session_id") || "";
@@ -25,9 +26,11 @@ if (orderId && stripeSessionId) {
 
     const customerEmail = sessionData?.session?.customer_details?.email || "";
     if (customerEmail) {
-      // @TODO - Send email to Darrin and send email to customer
-      await Astro.callAction(actions.email.send, { to: customerEmail, subject: "TESTSKATEBOARD", body: "TEST" });
-      await Astro.callAction(actions.bknd.markEmailSentOnUpdate, { orderId });
+      const app = await getApp();
+      const data = await app.drivers?.email?.send(customerEmail, "TESTSKATEBOARD", "TEST");
+      if (data) {
+        await Astro.callAction(actions.bknd.markEmailSentOnUpdate, { orderId });
+      }
     }
   }
 }

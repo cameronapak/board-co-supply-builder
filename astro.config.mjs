@@ -29,7 +29,7 @@ export default defineConfig({
       SQUARESPACE_PRODUCT_ID: envField.string({ context: "server", access: "secret" }),
       STRIPE_SECRET_KEY: envField.string({ context: "server", access: "secret" }),
       STRIPE_SECRET_TEST_KEY: envField.string({ context: "server", access: "secret" }),
-      PLUNK_EMAIL_API_KEY: envField.string({ context: "server", access: "secret" })
+      RESEND_API_KEY: envField.string({ context: "server", access: "secret" })
     }
   }
 });

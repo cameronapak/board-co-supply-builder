@@ -1,8 +1,9 @@
 import type { AstroBkndConfig } from "bknd/adapter/astro";
 import { registerLocalMediaAdapter } from "bknd/adapter/node";
 import type { APIContext } from "astro";
-import { em, enumm, medium, entity, systemEntity, text, libsql, boolean, date } from "bknd";
+import { em, enumm, medium, entity, systemEntity, text, libsql, boolean, date, type IEmailDriver } from "bknd";
 import { syncTypes } from "bknd/plugins";
+import { resendEmail } from "bknd";
 import { writeFile } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
 import {
@@ -10,7 +11,8 @@ import {
   LIBSQL_DATABASE_URL,
   S3_API_URL,
   S3_ACCESS_KEY,
-  S3_SECRET_ACCESS_KEY
+  S3_SECRET_ACCESS_KEY,
+  RESEND_API_KEY
 } from "astro:env/server";
 
 const local = registerLocalMediaAdapter();
@@ -63,8 +65,8 @@ const schema = em(
       designConfig: text({
         label: "Design Configuration"
       }), // JSON string for skateboard design configuration
-      artwork: medium({ virtual: true, fillable: ["update"], }),
-      canvas: medium({ virtual: true, fillable: ["update"], }),
+      artwork: medium(),
+      canvas: medium(),
       status: enumm({
         enum: [{
           value: "pending",
@@ -122,7 +124,7 @@ export default {
       })
     } : {
       connection: { url: "file:.astro/content.db" }
-    })
+    }),
   }),
   // an initial config is only applied if the database is empty
   config: {
@@ -203,6 +205,9 @@ export default {
           await writeFile("src/bknd-types.d.ts", et.toString());
         }
       })
-    ]
+    ],
+    drivers: {
+      email: resendEmail({ apiKey: RESEND_API_KEY }),
+    },
   }
 } as const satisfies AstroBkndConfig<APIContext>;
