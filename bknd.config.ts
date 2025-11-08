@@ -1,10 +1,8 @@
 import type { AstroBkndConfig } from "bknd/adapter/astro";
 import { registerLocalMediaAdapter } from "bknd/adapter/node";
 import type { APIContext } from "astro";
-import { em, enumm, medium, entity, systemEntity, text, libsql, boolean, date, type IEmailDriver } from "bknd";
-import { syncTypes } from "bknd/plugins";
+import { em, enumm, medium, entity, systemEntity, text, libsql, boolean, date } from "bknd";
 import { resendEmail } from "bknd";
-import { writeFile } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
 import {
   LIBSQL_DATABASE_TOKEN,
@@ -79,6 +77,9 @@ const schema = em(
         default_value: "pending"
       }),
       emailSent: boolean({ default_value: false }),
+      comments: text({
+        label: "Comments"
+      }),
       createdAt: date({
         label: "Created At"
       }),
@@ -195,19 +196,8 @@ export default {
         });
       }
     },
-    plugins: [
-      // Writes down the schema types on boot and config change,
-      // making sure the types are always up to date.
-      syncTypes({
-        enabled: true,
-        write: async (et) => {
-          // customize the location and the writer
-          await writeFile("src/bknd-types.d.ts", et.toString());
-        }
-      })
-    ],
     drivers: {
       email: resendEmail({ apiKey: RESEND_API_KEY }),
     },
-  }
-} as const satisfies AstroBkndConfig<APIContext>;
+  },
+} satisfies AstroBkndConfig<APIContext>;
