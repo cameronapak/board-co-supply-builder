@@ -78,6 +78,37 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
       </h1>
     </div>
 
+    <div class="alert">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path
+          d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+        ></path>
+        <path d="M12 8v4"></path>
+        <path d="M12 16h.01"></path>
+      </svg>
+      <h2>Terms of Service</h2>
+      <section>
+        <p class="mb-3">
+          We love creativity—but we also respect the work of other artists. Please only upload images you own or have
+          permission to use. Let's build something original together.
+        </p>
+        <label class="label flex items-start gap-2">
+          <input type="checkbox" x-model="$store.order.tosAccepted" class="input" />
+          I agree
+        </label>
+      </section>
+    </div>
+
     <div x-show="!imageUrl" class="relative w-full">
       <input
         x-ref="fileInput"
@@ -86,13 +117,15 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
         accept="image/*,application/pdf,.HEIC,.HEIF"
         @change="handleFileChange($event)"
         id="file-input"
+        :disabled="!$store.order.tosAccepted"
       />
       <button
         :class="imageUrl ? 'btn-secondary w-full' : 'btn w-full'"
+        :disabled="!$store.order.tosAccepted"
         type="button"
         @click="$el.previousElementSibling.click()"
       >
-        Choose Image
+        Upload Artwork
       </button>
     </div>
 

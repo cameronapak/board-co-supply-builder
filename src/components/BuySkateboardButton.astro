@@ -5,7 +5,7 @@
 <div class="w-full" x-data="stripe">
   <button
     class="btn btn-primary w-full"
-    :disabled="!isLoaded || !$store.order.shape || !$store.order.skateboardVariant"
+    :disabled="!isLoaded || !$store.order.shape || !$store.order.skateboardVariant || !$store.order.tosAccepted"
     @click="handleSaveDataAndStartOrder">Order Custom Deck</button
   >
   <dialog x-ref="stripeDialog" id="stripe-dialog" class="dialog">

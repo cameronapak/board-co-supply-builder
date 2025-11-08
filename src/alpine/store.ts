@@ -14,6 +14,7 @@ const orderStore = {
   shape: "" as SkateboardType,
   artwork: null as File | null,
   comments: "" as string,
+  tosAccepted: false as boolean,
 }
 
 export type OrderStore = typeof orderStore;
