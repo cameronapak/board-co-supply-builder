@@ -349,351 +349,352 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
           class="textarea w-full"
           rows="4"
           placeholder="Any special instructions or notes for your order..."></textarea>
+        <p class="text-muted-foreground mt-1 text-sm">We will contact you via email if we have any questions.</p>
+
+        <section class="mt-4">
+          <BuySkateboardButton />
+        </section>
+
+        <button @click="resetImage()" class="btn-outline mt-4 w-full">Restart</button>
       </div>
-
-      <section class="mt-4">
-        <BuySkateboardButton />
-      </section>
-
-      <button @click="resetImage()" class="btn-outline mt-4 w-full">Restart</button>
     </div>
-  </aside>
 
-  <script>
-    import Alpine from "alpinejs";
-    // @ts-expect-error - pdfjs works, but has an error
-    import * as pdfjsLib from "pdfjs-dist/build/pdf";
-    import { actions } from "astro:actions";
-    import { instantiateStore, getStore } from "@/alpine/store";
-    import { heicTo, isHeic } from "heic-to";
+    <script>
+      import Alpine from "alpinejs";
+      // @ts-expect-error - pdfjs works, but has an error
+      import * as pdfjsLib from "pdfjs-dist/build/pdf";
+      import { actions } from "astro:actions";
+      import { instantiateStore, getStore } from "@/alpine/store";
+      import { heicTo, isHeic } from "heic-to";
 
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
-    document.addEventListener("alpine:init", () => {
-      instantiateStore();
+      document.addEventListener("alpine:init", () => {
+        instantiateStore();
 
-      Alpine.data("skateboardDesigner", function () {
-        return {
-          imageUrl: "",
-          panX: 0,
-          panY: 0,
-          zoom: 1,
-          rotation: 0,
-          minZoom: 0.1,
-          maxZoom: 5,
-          zoomStep: 0.1,
-          isDragging: false,
-          startX: 0,
-          startY: 0,
-          initialPanX: 0,
-          initialPanY: 0,
-          snapThreshold: 15, // pixels within which snapping occurs
-          containerWidth: 0,
-          containerHeight: 0,
+        Alpine.data("skateboardDesigner", function () {
+          return {
+            imageUrl: "",
+            panX: 0,
+            panY: 0,
+            zoom: 1,
+            rotation: 0,
+            minZoom: 0.1,
+            maxZoom: 5,
+            zoomStep: 0.1,
+            isDragging: false,
+            startX: 0,
+            startY: 0,
+            initialPanX: 0,
+            initialPanY: 0,
+            snapThreshold: 15, // pixels within which snapping occurs
+            containerWidth: 0,
+            containerHeight: 0,
 
-          init() {
-            // Get container dimensions for snap calculations
-            this.$nextTick(() => {
+            init() {
+              // Get container dimensions for snap calculations
+              this.$nextTick(() => {
+                const container = this.$el.querySelector('[style*="aspect-ratio"]') as HTMLElement;
+                if (container) {
+                  this.containerWidth = container.offsetWidth;
+                  this.containerHeight = container.offsetHeight;
+                }
+              });
+            },
+
+            async validateStripeSession() {
+              const sessionId = new URLSearchParams(window.location.search).get("session_id");
+              if (!sessionId) {
+                return;
+              }
+
+              // Remove the session_id url param
+              const url = new URL(window.location.href);
+              url.searchParams.delete("session_id");
+              window.history.replaceState({}, "", url.toString());
+
+              // const session = await actions.stripe.validateSubscription.orThrow({ sessionId, imei: this.imei });
+              // if (!session) {
+              //   return;
+              // }
+
+              // if (session.isSubscribed) {
+              //   this.showSuccessToast("Congratulations! You're subscribed.");
+              //   this.showConfetti();
+              //   this.isSubscribed = true;
+              //   await this.addFeatureToDevice(KNOX_USER_GROUPS.SUBSCRIBED);
+              //   this.features.push(KNOX_USER_GROUPS.SUBSCRIBED);
+              // } else {
+              //   this.showErrorToast("Subscription validation failed. Please try again.");
+              // }
+            },
+
+            get store() {
+              return getStore();
+            },
+
+            async handleFileChange(event: Event) {
+              const file = (event.target as HTMLInputElement).files?.[0];
+              if (!file) {
+                return;
+              }
+
+              // Convert HEIC files to JPEG before processing
+              let processedFile = file;
+
+              if (await isHeic(file)) {
+                try {
+                  // Convert to JPEG
+                  const jpeg = await heicTo({
+                    blob: file,
+                    type: "image/jpeg",
+                    quality: 0.8
+                  });
+
+                  // Create a new File object with the converted JPEG data
+                  processedFile = new File([jpeg], file.name.replace(/\.(heic|heif)$/i, ".jpg"), {
+                    type: "image/jpeg",
+                    lastModified: Date.now()
+                  });
+                } catch (conversionError) {
+                  console.error("HEIC conversion failed:", conversionError);
+                  window.alert("Failed to convert HEIC file. Please try a different format.");
+                  (this.$refs.fileInput as HTMLInputElement).value = "";
+                  return;
+                }
+              }
+
+              const formData = new FormData();
+              formData.append("artwork", processedFile);
+              this.store.artwork = processedFile;
+
+              try {
+                const { data: validationResult, error } = await actions.validate.validateArtwork(formData);
+
+                if (error || !validationResult?.valid) {
+                  const errorMessage = error
+                    ? "An error occurred during validation"
+                    : validationResult?.message || "Validation failed";
+                  const suggestions = validationResult?.details?.suggestions?.join("\n- ");
+                  const alertMessage = `${errorMessage}\n\nSuggestions:\n${suggestions ? `- ${suggestions}` : "None"}`;
+                  window.alert(alertMessage);
+                  (this.$refs.fileInput as HTMLInputElement).value = ""; // Reset file input
+                  return;
+                }
+
+                if (validationResult.processedFile) {
+                  let processedFile =
+                    new File([validationResult.processedFile], "processed-artwork.jpg", {
+                      type: "image/jpeg",
+                      lastModified: Date.now()
+                    }) || null;
+                  this.store.artwork = processedFile;
+                }
+              } catch (error) {
+                console.error("Validation request failed:", error);
+                window.alert("An error occurred during file validation. Please try again.");
+                (this.$refs.fileInput as HTMLInputElement).value = "";
+                return;
+              }
+
+              if (processedFile.type.startsWith("image/")) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                  this.imageUrl = e.target?.result as string;
+                  this.resetAll();
+                };
+                reader.readAsDataURL(processedFile);
+              } else if (file.type === "application/pdf") {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                const page = await pdf.getPage(1); // Get the first page
+
+                const viewport = page.getViewport({ scale: 1.5 }); // Adjust scale as needed
+                const canvas = document.createElement("canvas");
+                const context = canvas.getContext("2d");
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                if (context) {
+                  const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                  };
+                  await page.render(renderContext).promise;
+                  this.imageUrl = canvas.toDataURL();
+                  this.resetAll();
+                } else {
+                  console.error("Could not get canvas context");
+                }
+              }
+            },
+
+            handleWheel(event: WheelEvent) {
+              if (!this.imageUrl) return;
+
+              const delta = event.deltaY > 0 ? -this.zoomStep : this.zoomStep;
+              const newZoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.zoom + delta));
+
+              if (newZoom !== this.zoom) {
+                this.zoom = newZoom;
+              }
+            },
+
+            zoomIn() {
+              const newZoom = Math.min(this.maxZoom, this.zoom + this.zoomStep);
+              this.zoom = newZoom;
+            },
+
+            zoomOut() {
+              const newZoom = Math.max(this.minZoom, this.zoom - this.zoomStep);
+              this.zoom = newZoom;
+            },
+
+            resetZoom() {
+              this.zoom = 1;
+            },
+
+            rotateLeft() {
+              this.rotation = (this.rotation - 90) % 360;
+              if (this.rotation < 0) {
+                this.rotation += 360;
+              }
+            },
+
+            rotateRight() {
+              this.rotation = (this.rotation + 90) % 360;
+            },
+
+            resetRotation() {
+              this.rotation = 0;
+            },
+
+            startPan(event: MouseEvent | TouchEvent) {
+              this.isDragging = true;
+              this.initialPanX = this.panX;
+              this.initialPanY = this.panY;
+
+              if (event instanceof MouseEvent) {
+                this.startX = event.clientX;
+                this.startY = event.clientY;
+              } else {
+                this.startX = event.touches[0].clientX;
+                this.startY = event.touches[0].clientY;
+              }
+
+              // Update container dimensions in case of resize
               const container = this.$el.querySelector('[style*="aspect-ratio"]') as HTMLElement;
               if (container) {
                 this.containerWidth = container.offsetWidth;
                 this.containerHeight = container.offsetHeight;
               }
-            });
-          },
 
-          async validateStripeSession() {
-            const sessionId = new URLSearchParams(window.location.search).get("session_id");
-            if (!sessionId) {
-              return;
-            }
+              // Add global event listeners
+              document.addEventListener("mousemove", this.handlePan.bind(this));
+              document.addEventListener("mouseup", this.endPan.bind(this));
+              document.addEventListener("touchmove", this.handlePan.bind(this));
+              document.addEventListener("touchend", this.endPan.bind(this));
 
-            // Remove the session_id url param
-            const url = new URL(window.location.href);
-            url.searchParams.delete("session_id");
-            window.history.replaceState({}, "", url.toString());
+              event.preventDefault();
+            },
 
-            // const session = await actions.stripe.validateSubscription.orThrow({ sessionId, imei: this.imei });
-            // if (!session) {
-            //   return;
-            // }
+            handlePan(event: MouseEvent | TouchEvent) {
+              if (!this.isDragging) return;
 
-            // if (session.isSubscribed) {
-            //   this.showSuccessToast("Congratulations! You're subscribed.");
-            //   this.showConfetti();
-            //   this.isSubscribed = true;
-            //   await this.addFeatureToDevice(KNOX_USER_GROUPS.SUBSCRIBED);
-            //   this.features.push(KNOX_USER_GROUPS.SUBSCRIBED);
-            // } else {
-            //   this.showErrorToast("Subscription validation failed. Please try again.");
-            // }
-          },
-
-          get store() {
-            return getStore();
-          },
-
-          async handleFileChange(event: Event) {
-            const file = (event.target as HTMLInputElement).files?.[0];
-            if (!file) {
-              return;
-            }
-
-            // Convert HEIC files to JPEG before processing
-            let processedFile = file;
-
-            if (await isHeic(file)) {
-              try {
-                // Convert to JPEG
-                const jpeg = await heicTo({
-                  blob: file,
-                  type: "image/jpeg",
-                  quality: 0.8
-                });
-
-                // Create a new File object with the converted JPEG data
-                processedFile = new File([jpeg], file.name.replace(/\.(heic|heif)$/i, ".jpg"), {
-                  type: "image/jpeg",
-                  lastModified: Date.now()
-                });
-              } catch (conversionError) {
-                console.error("HEIC conversion failed:", conversionError);
-                window.alert("Failed to convert HEIC file. Please try a different format.");
-                (this.$refs.fileInput as HTMLInputElement).value = "";
-                return;
-              }
-            }
-
-            const formData = new FormData();
-            formData.append("artwork", processedFile);
-            this.store.artwork = processedFile;
-
-            try {
-              const { data: validationResult, error } = await actions.validate.validateArtwork(formData);
-
-              if (error || !validationResult?.valid) {
-                const errorMessage = error
-                  ? "An error occurred during validation"
-                  : validationResult?.message || "Validation failed";
-                const suggestions = validationResult?.details?.suggestions?.join("\n- ");
-                const alertMessage = `${errorMessage}\n\nSuggestions:\n${suggestions ? `- ${suggestions}` : "None"}`;
-                window.alert(alertMessage);
-                (this.$refs.fileInput as HTMLInputElement).value = ""; // Reset file input
-                return;
-              }
-
-              if (validationResult.processedFile) {
-                let processedFile =
-                  new File([validationResult.processedFile], "processed-artwork.jpg", {
-                    type: "image/jpeg",
-                    lastModified: Date.now()
-                  }) || null;
-                this.store.artwork = processedFile;
-              }
-            } catch (error) {
-              console.error("Validation request failed:", error);
-              window.alert("An error occurred during file validation. Please try again.");
-              (this.$refs.fileInput as HTMLInputElement).value = "";
-              return;
-            }
-
-            if (processedFile.type.startsWith("image/")) {
-              const reader = new FileReader();
-              reader.onload = (e) => {
-                this.imageUrl = e.target?.result as string;
-                this.resetAll();
-              };
-              reader.readAsDataURL(processedFile);
-            } else if (file.type === "application/pdf") {
-              const arrayBuffer = await file.arrayBuffer();
-              const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-              const page = await pdf.getPage(1); // Get the first page
-
-              const viewport = page.getViewport({ scale: 1.5 }); // Adjust scale as needed
-              const canvas = document.createElement("canvas");
-              const context = canvas.getContext("2d");
-              canvas.height = viewport.height;
-              canvas.width = viewport.width;
-
-              if (context) {
-                const renderContext = {
-                  canvasContext: context,
-                  viewport: viewport
-                };
-                await page.render(renderContext).promise;
-                this.imageUrl = canvas.toDataURL();
-                this.resetAll();
+              let currentX, currentY;
+              if (event instanceof MouseEvent) {
+                currentX = event.clientX;
+                currentY = event.clientY;
               } else {
-                console.error("Could not get canvas context");
+                currentX = event.touches[0].clientX;
+                currentY = event.touches[0].clientY;
               }
+
+              let deltaX = currentX - this.startX;
+              let deltaY = currentY - this.startY;
+
+              // On mobile, rotate movement -90 degrees
+              const isMobile = window.innerWidth <= 768;
+              if (isMobile) {
+                // Swap and invert axes for -90 degree rotation
+                const rotatedDeltaX = -deltaY;
+                const rotatedDeltaY = deltaX;
+                deltaX = rotatedDeltaX;
+                deltaY = rotatedDeltaY;
+              }
+
+              let newPanX = this.initialPanX + deltaX;
+              let newPanY = this.initialPanY + deltaY;
+
+              // Apply snapping
+              const snapped = this.applySnapping(newPanX, newPanY);
+              this.panX = snapped.x;
+              this.panY = snapped.y;
+
+              event.preventDefault();
+            },
+
+            applySnapping(panX: number, panY: number) {
+              // Define center snap positions
+              const centerX = this.containerWidth * 0.5; // 50% (center)
+              const centerY = this.containerHeight * 0.5; // 50% (center)
+
+              let snappedX = panX;
+              let snappedY = panY;
+
+              // Check horizontal center snapping
+              // The image center is at containerWidth/2 + panX
+              const imageCenterX = this.containerWidth / 2 + panX;
+              if (Math.abs(imageCenterX - centerX) <= this.snapThreshold) {
+                snappedX = centerX - this.containerWidth / 2;
+              }
+
+              // Check vertical center snapping
+              // The image center is at containerHeight/2 + panY
+              const imageCenterY = this.containerHeight / 2 + panY;
+              if (Math.abs(imageCenterY - centerY) <= this.snapThreshold) {
+                snappedY = centerY - this.containerHeight / 2;
+              }
+
+              return { x: snappedX, y: snappedY };
+            },
+
+            endPan() {
+              this.isDragging = false;
+
+              // Remove global event listeners
+              document.removeEventListener("mousemove", this.handlePan.bind(this));
+              document.removeEventListener("mouseup", this.endPan.bind(this));
+              document.removeEventListener("touchmove", this.handlePan.bind(this));
+              document.removeEventListener("touchend", this.endPan.bind(this));
+            },
+
+            resetPosition() {
+              this.panX = 0;
+              this.panY = 0;
+            },
+
+            resetAll() {
+              this.panX = 0;
+              this.panY = 0;
+              this.zoom = 1;
+              this.rotation = 0;
+            },
+
+            resetImage() {
+              this.imageUrl = "";
+              (this.$refs.fileInput as HTMLInputElement).value = "";
+              this.resetAll();
+            },
+
+            // Helper method for quick positioning
+            centerImage() {
+              this.panX = 0;
+              this.panY = 0;
             }
-          },
-
-          handleWheel(event: WheelEvent) {
-            if (!this.imageUrl) return;
-
-            const delta = event.deltaY > 0 ? -this.zoomStep : this.zoomStep;
-            const newZoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.zoom + delta));
-
-            if (newZoom !== this.zoom) {
-              this.zoom = newZoom;
-            }
-          },
-
-          zoomIn() {
-            const newZoom = Math.min(this.maxZoom, this.zoom + this.zoomStep);
-            this.zoom = newZoom;
-          },
-
-          zoomOut() {
-            const newZoom = Math.max(this.minZoom, this.zoom - this.zoomStep);
-            this.zoom = newZoom;
-          },
-
-          resetZoom() {
-            this.zoom = 1;
-          },
-
-          rotateLeft() {
-            this.rotation = (this.rotation - 90) % 360;
-            if (this.rotation < 0) {
-              this.rotation += 360;
-            }
-          },
-
-          rotateRight() {
-            this.rotation = (this.rotation + 90) % 360;
-          },
-
-          resetRotation() {
-            this.rotation = 0;
-          },
-
-          startPan(event: MouseEvent | TouchEvent) {
-            this.isDragging = true;
-            this.initialPanX = this.panX;
-            this.initialPanY = this.panY;
-
-            if (event instanceof MouseEvent) {
-              this.startX = event.clientX;
-              this.startY = event.clientY;
-            } else {
-              this.startX = event.touches[0].clientX;
-              this.startY = event.touches[0].clientY;
-            }
-
-            // Update container dimensions in case of resize
-            const container = this.$el.querySelector('[style*="aspect-ratio"]') as HTMLElement;
-            if (container) {
-              this.containerWidth = container.offsetWidth;
-              this.containerHeight = container.offsetHeight;
-            }
-
-            // Add global event listeners
-            document.addEventListener("mousemove", this.handlePan.bind(this));
-            document.addEventListener("mouseup", this.endPan.bind(this));
-            document.addEventListener("touchmove", this.handlePan.bind(this));
-            document.addEventListener("touchend", this.endPan.bind(this));
-
-            event.preventDefault();
-          },
-
-          handlePan(event: MouseEvent | TouchEvent) {
-            if (!this.isDragging) return;
-
-            let currentX, currentY;
-            if (event instanceof MouseEvent) {
-              currentX = event.clientX;
-              currentY = event.clientY;
-            } else {
-              currentX = event.touches[0].clientX;
-              currentY = event.touches[0].clientY;
-            }
-
-            let deltaX = currentX - this.startX;
-            let deltaY = currentY - this.startY;
-
-            // On mobile, rotate movement -90 degrees
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-              // Swap and invert axes for -90 degree rotation
-              const rotatedDeltaX = -deltaY;
-              const rotatedDeltaY = deltaX;
-              deltaX = rotatedDeltaX;
-              deltaY = rotatedDeltaY;
-            }
-
-            let newPanX = this.initialPanX + deltaX;
-            let newPanY = this.initialPanY + deltaY;
-
-            // Apply snapping
-            const snapped = this.applySnapping(newPanX, newPanY);
-            this.panX = snapped.x;
-            this.panY = snapped.y;
-
-            event.preventDefault();
-          },
-
-          applySnapping(panX: number, panY: number) {
-            // Define center snap positions
-            const centerX = this.containerWidth * 0.5; // 50% (center)
-            const centerY = this.containerHeight * 0.5; // 50% (center)
-
-            let snappedX = panX;
-            let snappedY = panY;
-
-            // Check horizontal center snapping
-            // The image center is at containerWidth/2 + panX
-            const imageCenterX = this.containerWidth / 2 + panX;
-            if (Math.abs(imageCenterX - centerX) <= this.snapThreshold) {
-              snappedX = centerX - this.containerWidth / 2;
-            }
-
-            // Check vertical center snapping
-            // The image center is at containerHeight/2 + panY
-            const imageCenterY = this.containerHeight / 2 + panY;
-            if (Math.abs(imageCenterY - centerY) <= this.snapThreshold) {
-              snappedY = centerY - this.containerHeight / 2;
-            }
-
-            return { x: snappedX, y: snappedY };
-          },
-
-          endPan() {
-            this.isDragging = false;
-
-            // Remove global event listeners
-            document.removeEventListener("mousemove", this.handlePan.bind(this));
-            document.removeEventListener("mouseup", this.endPan.bind(this));
-            document.removeEventListener("touchmove", this.handlePan.bind(this));
-            document.removeEventListener("touchend", this.endPan.bind(this));
-          },
-
-          resetPosition() {
-            this.panX = 0;
-            this.panY = 0;
-          },
-
-          resetAll() {
-            this.panX = 0;
-            this.panY = 0;
-            this.zoom = 1;
-            this.rotation = 0;
-          },
-
-          resetImage() {
-            this.imageUrl = "";
-            (this.$refs.fileInput as HTMLInputElement).value = "";
-            this.resetAll();
-          },
-
-          // Helper method for quick positioning
-          centerImage() {
-            this.panX = 0;
-            this.panY = 0;
-          }
-        };
+          };
+        });
       });
-    });
-  </script>
+    </script>
+  </aside>
 </div>
