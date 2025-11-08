@@ -32,6 +32,7 @@ if (orderId && stripeSessionId) {
   <li>Stripe Order ID: ${order.stripeOrderId || "N/A"}</li>
   <li>Status: ${order.status || "N/A"}</li>
   <li>Created At: ${createdAt}</li>
+  ${order.comments ? `<li>Comments: ${order.comments}</li>` : ""}
 </ul>
 <br>
 <a href="${adminEditUrl}" target="_blank">View and Edit Order</a>`;

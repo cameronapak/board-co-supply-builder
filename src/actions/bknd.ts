@@ -13,24 +13,26 @@ export const bknd = {
       canvas: z.instanceof(File),
       designConfig: z.string().optional(),
       type: z.enum(["popsicle", "shovel"]),
-      size: z.enum(['8.0 inches', '8.125 inches', '8.25 inches', '8.375 inches', '8.5 inches', '8.75 inches', '9.0 inches'])
+      size: z.enum(['8.0 inches', '8.125 inches', '8.25 inches', '8.375 inches', '8.5 inches', '8.75 inches', '9.0 inches']),
+      comments: z.string().optional()
     }),
-    handler: async ({ artwork, type, size, designConfig, canvas }, context) => {
+    handler: async ({ artwork, type, size, designConfig, canvas, comments }, context) => {
       const api = await getApi(context.request.headers, { mode: "dynamic" });
 
-      const order = await api.data.createOne("orders", {
+      const order: BkndEntityCreate<"orders"> = await api.data.createOne("orders", {
         designConfig,
         status: "pending",
         type,
         size,
         createdAt: new Date(),
         updatedAt: new Date(),
-      } as Orders)
+        ...(comments ? { comments } : {}),
+      });
 
       // Original Artwork
       await api.media.uploadToEntity(
         "orders", // entity name
-        order.id, // entity id
+        order.id as number, // entity id
         "artwork", // entity media field
         artwork // url, file, stream
       );
@@ -38,12 +40,12 @@ export const bknd = {
       // Rendered Canvas Artwork
       await api.media.uploadToEntity(
         "orders", // entity name
-        order.id, // entity id
+        order.id as number, // entity id
         "canvas", // entity media field
         canvas // url, file, stream
       );
 
-      return { order: order.toJSON() };
+      return { order };
     }
   }),
 
@@ -62,6 +64,7 @@ export const bknd = {
       // For some reason, when there isn't an order to update with
       // that given id, then the error I get is something like
       // `{ meta: { items: 0, time: 0.11, count: 0, total: 1 } }`
+      // @ts-expect-error - order.meta is not typed
       if (order?.meta?.items === 0 || error) {
         throw new ActionError({
           message: "Failed to attach the Stripe Session ID to the Order",
@@ -86,6 +89,7 @@ export const bknd = {
       // For some reason, when there isn't an order to update with
       // that given id, then the error I get is something like
       // `{ meta: { items: 0, time: 0.11, count: 0, total: 1 } }`
+      // @ts-expect-error - order.meta is not typed
       if (order?.meta?.items === 0 || error) {
         throw new ActionError({
           message: "Failed to update the order to mark email as sent",

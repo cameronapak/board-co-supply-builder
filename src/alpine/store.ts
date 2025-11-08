@@ -13,6 +13,7 @@ const orderStore = {
   size: "" as SkateboardSize,
   shape: "" as SkateboardType,
   artwork: null as File | null,
+  comments: "" as string,
 }
 
 export type OrderStore = typeof orderStore;

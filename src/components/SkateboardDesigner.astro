@@ -308,6 +308,16 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
         } -->
       </div>
 
+      <div class="border-b py-3">
+        <label for="comments" class="paragraph mb-2 block font-semibold">Comments</label>
+        <textarea
+          id="comments"
+          x-model="$store.order.comments"
+          class="textarea w-full"
+          rows="4"
+          placeholder="Any special instructions or notes for your order..."></textarea>
+      </div>
+
       <section class="mt-4">
         <BuySkateboardButton />
       </section>

@@ -82,6 +82,9 @@
           // so that I can replicate user's DND of the image
           formData.append("designConfig", JSON.stringify(this.store.skateboardVariant));
           formData.append("canvas", skateboardCanvasImg as File);
+          if (this.store.comments) {
+            formData.append("comments", this.store.comments);
+          }
           const { data: orderData } = await actions.bknd.createOrder(formData);
           // Send order number to the redirect link in createPayment
           // Redirect link must be `/success?session_id={SESSION_ID}&order_id={ORDER_ID}`
