@@ -1,7 +1,7 @@
 import type { AstroBkndConfig } from "bknd/adapter/astro";
 import { registerLocalMediaAdapter } from "bknd/adapter/node";
 import type { APIContext } from "astro";
-import { em, enumm, media, entity, text, libsql, boolean, date } from "bknd";
+import { em, enumm, media, medium, entity, systemEntity, text, libsql, boolean, date } from "bknd";
 import { syncTypes } from "bknd/plugins";
 import { writeFile } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
@@ -63,8 +63,8 @@ const schema = em(
       designConfig: text({
         label: "Design Configuration"
       }), // JSON string for skateboard design configuration
-      artwork: media({ virtual: true, fillable: ["update"], }),
-      canvas: media({ virtual: true, fillable: ["update"], }),
+      artwork: medium({ virtual: true, fillable: ["update"], }),
+      canvas: medium({ virtual: true, fillable: ["update"], }),
       status: enumm({
         enum: [{
           value: "pending",
@@ -93,7 +93,7 @@ const schema = em(
       // primary_format: "uuid",
     }),
 
-    media: entity("media", {}),
+    media: systemEntity("media", {}),
   },
   ({ relation, index }, { orders, media }) => {
     index(orders)
@@ -102,14 +102,12 @@ const schema = em(
       .on(["status"]) // Index for status filtering
       .on(["createdAt"]); // Index for chronological ordering
 
-    relation(orders).polyToMany(media, {
-      mappedBy: "artwork",
-      targetCardinality: 1
+    relation(orders).polyToOne(media, {
+      mappedBy: "artwork"
     });
 
-    relation(orders).polyToMany(media, {
-      mappedBy: "canvas",
-      targetCardinality: 1
+    relation(orders).polyToOne(media, {
+      mappedBy: "canvas"
     });
   }
 );
