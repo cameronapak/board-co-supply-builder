@@ -1,9 +1,9 @@
-import { defineAction } from "astro:actions";
+import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
 import { STRIPE_SECRET_KEY, STRIPE_SECRET_TEST_KEY } from "astro:env/server";
 import Stripe from "stripe";
 
-const stripeInstance = new Stripe(
+const getStripeInstance = () => new Stripe(
   import.meta.env.PROD
     ? STRIPE_SECRET_KEY
     : STRIPE_SECRET_TEST_KEY,
@@ -26,6 +26,7 @@ export const stripe = {
       console.log({ orderId })
       const returnUrl = new URL("/success", context.url.origin);
 
+      const stripeInstance = getStripeInstance();
       const session = await stripeInstance.checkout.sessions.create({
         ui_mode: "embedded",
         line_items: [
@@ -50,4 +51,26 @@ export const stripe = {
       };
     }
   }),
+
+  getSesssionFromId: defineAction({
+    input: z.object({
+      id: z.string()
+    }),
+    handler: async ({ id }, _context) => {
+      const stripeInstance = getStripeInstance();
+      const session = await stripeInstance.checkout.sessions.retrieve(id);
+      if (!session) {
+        throw new ActionError({
+          code: "NOT_FOUND"
+        })
+      }
+      const lineItems = await stripeInstance.checkout.sessions.listLineItems(id);
+      if (!lineItems) {
+        throw new ActionError({
+          code: "NOT_FOUND"
+        })
+      }
+      return { session, lineItems };
+    }
+  })
 };

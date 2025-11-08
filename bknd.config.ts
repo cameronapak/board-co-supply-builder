@@ -1,8 +1,9 @@
 import type { AstroBkndConfig } from "bknd/adapter/astro";
 import { registerLocalMediaAdapter } from "bknd/adapter/node";
 import type { APIContext } from "astro";
-import { em, enumm, media, entity, text, libsql, date } from "bknd";
+import { em, enumm, medium, entity, systemEntity, text, libsql, boolean, date, type IEmailDriver } from "bknd";
 import { syncTypes } from "bknd/plugins";
+import { resendEmail } from "bknd";
 import { writeFile } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
 import {
@@ -10,7 +11,8 @@ import {
   LIBSQL_DATABASE_URL,
   S3_API_URL,
   S3_ACCESS_KEY,
-  S3_SECRET_ACCESS_KEY
+  S3_SECRET_ACCESS_KEY,
+  RESEND_API_KEY
 } from "astro:env/server";
 
 const local = registerLocalMediaAdapter();
@@ -63,8 +65,8 @@ const schema = em(
       designConfig: text({
         label: "Design Configuration"
       }), // JSON string for skateboard design configuration
-      artwork: media({ virtual: true, fillable: ["update"], }),
-      canvas: media({ virtual: true, fillable: ["update"], }),
+      artwork: medium(),
+      canvas: medium(),
       status: enumm({
         enum: [{
           value: "pending",
@@ -76,6 +78,7 @@ const schema = em(
         label: "Order Status",
         default_value: "pending"
       }),
+      emailSent: boolean({ default_value: false }),
       createdAt: date({
         label: "Created At"
       }),
@@ -92,7 +95,7 @@ const schema = em(
       // primary_format: "uuid",
     }),
 
-    media: entity("media", {}),
+    media: systemEntity("media", {}),
   },
   ({ relation, index }, { orders, media }) => {
     index(orders)
@@ -101,14 +104,12 @@ const schema = em(
       .on(["status"]) // Index for status filtering
       .on(["createdAt"]); // Index for chronological ordering
 
-    relation(orders).polyToMany(media, {
-      mappedBy: "artwork",
-      targetCardinality: 1
+    relation(orders).polyToOne(media, {
+      mappedBy: "artwork"
     });
 
-    relation(orders).polyToMany(media, {
-      mappedBy: "canvas",
-      targetCardinality: 1
+    relation(orders).polyToOne(media, {
+      mappedBy: "canvas"
     });
   }
 );
@@ -123,7 +124,7 @@ export default {
       })
     } : {
       connection: { url: "file:.astro/content.db" }
-    })
+    }),
   }),
   // an initial config is only applied if the database is empty
   config: {
@@ -204,6 +205,9 @@ export default {
           await writeFile("src/bknd-types.d.ts", et.toString());
         }
       })
-    ]
+    ],
+    drivers: {
+      email: resendEmail({ apiKey: RESEND_API_KEY }),
+    },
   }
 } as const satisfies AstroBkndConfig<APIContext>;

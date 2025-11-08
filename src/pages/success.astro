@@ -3,6 +3,7 @@ import { actions } from "astro:actions";
 import { type Orders } from "@/bknd-types";
 import Logo from "@/components/Logo.astro";
 import Layout from "@/layouts/Layout.astro";
+import { getApp } from "@/bknd";
 
 const orderId = Number(Astro.url.searchParams.get("order_id") || "0");
 const stripeSessionId = Astro.url.searchParams.get("session_id") || "";
@@ -16,6 +17,33 @@ if (orderId && stripeSessionId) {
 
   if (data?.order) {
     order = data.order;
+
+    if (!order?.emailSent) {
+      const app = await getApp();
+      const adminEditUrl = `${Astro.url.origin}/admin/data/entity/orders/edit/${order.id}`;
+      const createdAt = order.createdAt ? new Date(order.createdAt).toLocaleString() : "N/A";
+
+      const emailBody = `<h1>New Skateboard Order #${order.id}</h1>
+<br>
+<ul>
+  <li>Order ID: ${order.id}</li>
+  <li>Size: ${order.size || "N/A"}</li>
+  <li>Type: ${order.type || "N/A"}</li>
+  <li>Stripe Order ID: ${order.stripeOrderId || "N/A"}</li>
+  <li>Status: ${order.status || "N/A"}</li>
+  <li>Created At: ${createdAt}</li>
+</ul>
+<br>
+<a href="${adminEditUrl}" target="_blank">View and Edit Order</a>`;
+
+      const emailSubject = `New Skateboard Order #${order.id}`;
+      const shopOwnerEmail = "cameronandrewpak@gmail.com";
+
+      const data = await app.drivers?.email?.send(shopOwnerEmail, emailSubject, emailBody);
+      if (data) {
+        await Astro.callAction(actions.bknd.markEmailSentOnUpdate, { orderId });
+      }
+    }
   }
 }
 ---
