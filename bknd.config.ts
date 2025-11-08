@@ -1,7 +1,7 @@
 import type { AstroBkndConfig } from "bknd/adapter/astro";
 import { registerLocalMediaAdapter } from "bknd/adapter/node";
 import type { APIContext } from "astro";
-import { em, enumm, media, medium, entity, systemEntity, text, libsql, boolean, date } from "bknd";
+import { em, enumm, medium, entity, systemEntity, text, libsql, boolean, date } from "bknd";
 import { syncTypes } from "bknd/plugins";
 import { writeFile } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
