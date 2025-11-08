@@ -45,7 +45,7 @@ export const bknd = {
         canvas // url, file, stream
       );
 
-      return { order };
+      return { order: (order as any).toJSON() };
     }
   }),
 
