@@ -78,7 +78,7 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
       </h1>
     </div>
 
-    <div class="alert">
+    <div x-show="!imageUrl" x-cloak class="alert">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"
