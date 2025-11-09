@@ -2,6 +2,7 @@
 import { getApi } from "@/bknd.ts";
 import Layout from "@/layouts/Layout.astro";
 import SkateboardDesigner from "@/components/SkateboardDesigner.astro";
+import Footer from "@/components/footer.astro";
 
 const api = await getApi(Astro.request.headers, { verify: true, mode: "dynamic" });
 
@@ -13,4 +14,6 @@ const user = api.getUser();
   <section class="mx-auto flex max-w-xl flex-col gap-4 p-6">
     <SkateboardDesigner />
   </section>
+
+  <Footer />
 </Layout>

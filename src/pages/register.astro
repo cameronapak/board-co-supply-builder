@@ -1,9 +1,11 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import Footer from "@/components/footer.astro";
 ---
 
 <Layout title="Register">
   <section class="mx-auto flex max-w-md flex-col gap-4 p-6">
+    <a href="/" class="btn btn-secondary">Back to the Board Builder</a>
     <div class="card w-full">
       <header>
         <h2>Register for an account</h2>
@@ -30,4 +32,6 @@ import Layout from "@/layouts/Layout.astro";
       </footer>
     </div>
   </section>
+
+  <Footer />
 </Layout>
