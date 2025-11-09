@@ -283,7 +283,7 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
             </header>
 
             <section>
-              <img src="http://localhost:4321/api/media/file/deck-shapes.png" class="max-h-[256px] rounded-xl border" />
+              <img src="/skateboard-shapes.png" class="max-h-[256px] rounded-xl border" />
             </section>
 
             <footer>
@@ -436,12 +436,12 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
             },
 
             async handleFileChange(event: Event) {
-            const file = (event.target as HTMLInputElement).files?.[0];
-            if (!file) {
-            return;
-            }
+              const file = (event.target as HTMLInputElement).files?.[0];
+              if (!file) {
+                return;
+              }
 
-               this.isUploading = true;
+              this.isUploading = true;
 
               // Convert HEIC files to JPEG before processing
               let processedFile = file;
@@ -465,8 +465,8 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
                   window.alert("Failed to convert HEIC file. Please try a different format.");
                   (this.$refs.fileInput as HTMLInputElement).value = "";
                   this.isUploading = false;
-                    return;
-                 }
+                  return;
+                }
               }
 
               const formData = new FormData();
@@ -477,16 +477,16 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
                 const { data: validationResult, error } = await actions.validate.validateArtwork(formData);
 
                 if (error || !validationResult?.valid) {
-                const errorMessage = error
-                ? "An error occurred during validation"
-                : validationResult?.message || "Validation failed";
-                const suggestions = validationResult?.details?.suggestions?.join("\n- ");
-                const alertMessage = `${errorMessage}\n\nSuggestions:\n${suggestions ? `- ${suggestions}` : "None"}`;
-                window.alert(alertMessage);
-                (this.$refs.fileInput as HTMLInputElement).value = ""; // Reset file input
-                this.isUploading = false;
+                  const errorMessage = error
+                    ? "An error occurred during validation"
+                    : validationResult?.message || "Validation failed";
+                  const suggestions = validationResult?.details?.suggestions?.join("\n- ");
+                  const alertMessage = `${errorMessage}\n\nSuggestions:\n${suggestions ? `- ${suggestions}` : "None"}`;
+                  window.alert(alertMessage);
+                  (this.$refs.fileInput as HTMLInputElement).value = ""; // Reset file input
+                  this.isUploading = false;
                   return;
-                 }
+                }
 
                 if (validationResult.processedFile) {
                   let processedFile =
@@ -497,46 +497,46 @@ const deckShapes = [...new Set(data?.variants.map((variant) => variant.attribute
                   this.store.artwork = processedFile;
                 }
               } catch (error) {
-              console.error("Validation request failed:", error);
-              window.alert("An error occurred during file validation. Please try again.");
-              (this.$refs.fileInput as HTMLInputElement).value = "";
-              this.isUploading = false;
+                console.error("Validation request failed:", error);
+                window.alert("An error occurred during file validation. Please try again.");
+                (this.$refs.fileInput as HTMLInputElement).value = "";
+                this.isUploading = false;
                 return;
-               }
+              }
 
               if (processedFile.type.startsWith("image/")) {
-              const reader = new FileReader();
-              reader.onload = (e) => {
-              this.imageUrl = e.target?.result as string;
-              this.resetAll();
-                this.isUploading = false;
-              };
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                  this.imageUrl = e.target?.result as string;
+                  this.resetAll();
+                  this.isUploading = false;
+                };
                 reader.readAsDataURL(processedFile);
               } else if (file.type === "application/pdf") {
-              const arrayBuffer = await file.arrayBuffer();
-              const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-                 const page = await pdf.getPage(1); // Get the first page
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                const page = await pdf.getPage(1); // Get the first page
 
-              const viewport = page.getViewport({ scale: 1.5 }); // Adjust scale as needed
-              const canvas = document.createElement("canvas");
-              const context = canvas.getContext("2d");
-              canvas.height = viewport.height;
-                 canvas.width = viewport.width;
+                const viewport = page.getViewport({ scale: 1.5 }); // Adjust scale as needed
+                const canvas = document.createElement("canvas");
+                const context = canvas.getContext("2d");
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
 
-              if (context) {
-              const renderContext = {
-              canvasContext: context,
-                viewport: viewport
-              };
-              await page.render(renderContext).promise;
-              this.imageUrl = canvas.toDataURL();
-                this.resetAll();
-              this.isUploading = false;
-              } else {
+                if (context) {
+                  const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                  };
+                  await page.render(renderContext).promise;
+                  this.imageUrl = canvas.toDataURL();
+                  this.resetAll();
+                  this.isUploading = false;
+                } else {
                   console.error("Could not get canvas context");
-                   this.isUploading = false;
-                 }
-               }
+                  this.isUploading = false;
+                }
+              }
             },
 
             handleWheel(event: WheelEvent) {
