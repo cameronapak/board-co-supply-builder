@@ -44,10 +44,14 @@ if (orderId && stripeSessionId) {
 <br>
 <a href="${adminEditUrl}" target="_blank">View and Edit Order</a>`;
 
-      const emailSubject = `New Skateboard Order #${order.id}${import.meta.env.PROD ? '' : ' TEST'}`;
+      const emailSubject = `New Skateboard Order #${order.id}${import.meta.env.PROD ? "" : " TEST"}`;
       const shopOwnerEmail = "cameronandrewpak@gmail.com";
 
-      const data = await app.drivers?.email?.send(shopOwnerEmail, emailSubject, emailBody);
+      const data = await app.drivers?.email?.send(shopOwnerEmail, emailSubject, emailBody, {
+        reply_to: "darrin@boardcosupply.com",
+        // Temporarily forwarding to my personal email to ensure emails are sent.
+        bcc: "cameronandrewpak@gmail.com"
+      });
       if (data) {
         await Astro.callAction(actions.bknd.markEmailSentOnUpdate, { orderId });
       }

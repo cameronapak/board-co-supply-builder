@@ -187,7 +187,10 @@ const config = {
       }
     },
     drivers: {
-      email: resendEmail({ apiKey: process.env.RESEND_API_KEY || "" }),
+      email: resendEmail({
+        apiKey: process.env.RESEND_API_KEY || "",
+        from: "Board Co Supply <onboarding@resend.dev>",
+      }),
     },
     mode: "code",
   },
