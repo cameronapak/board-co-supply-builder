@@ -1,55 +1,51 @@
-# Agent Guidelines
+# AGENTS.md
 
-## Build/Lint/Test Commands
+## Setup commands
 
-- **Dev server**: `astro dev`
-- **Dev server (production mode)**: `PROD=true dotenv -e .env -- astro dev`
-- **Build**: `astro build`
-- **Preview**: `astro preview`
-- **Test all**: `bun test`
-- **Test single file**: `bun test <path-to-test-file>` (e.g., `bun test src/services/squarespace.test.ts`)
-- **Format**: `prettier -w .`
-- **Reset local DB**: `rm .astro/content.db`
-- **Update packages**: `bun update --interactive`
-- **Pre-build/copy assets**: `bknd copy-assets --out public/bknd --clean`
+- Install deps: `bun install`
+- Start dev server: `astro dev`
+- Start dev server (production mode): `PROD=true dotenv -e .env -- astro dev`
+- Build: `astro build`
+- Preview: `astro preview`
+- Format code: `prettier -w .`
+- Update packages: `bun update --interactive`
+- Reset local DB: `rm .astro/content.db`
+- Pre-build assets: `bknd copy-assets --out public/bknd --clean`
 
-## Architecture
+## Testing instructions
 
-- **Frontend**: Astro + TypeScript + Alpine.js + TailwindCSS + Basecoat UI
-- **Backend**: Bknd.io (database, auth, media management with code-only mode)
-- **Database**: LibSQL (SQLite local dev, Turso prod) with schema defined in bknd.config.ts
-- **Media**: Local filesystem dev, S3 prod (configured via bknd.config.ts)
-- **Deployment**: Netlify adapter with server-side rendering
-- **Integrations**: Stripe payments, Squarespace API, Resend email
-- **Authentication**: Bknd.io auth with JWT, role-based permissions (admin/default roles)
-- **Core Entities**: orders (skateboard orders), media (file management)
-- **Order Schema**: userId, size, type (popsicle/shovel), stripeOrderId, designConfig (JSON), artwork, canvas, status, emailSent, comments, timestamps
+- Run all tests: `bun test`
+- Run single test file: `bun test <path-to-test-file>` (e.g., `bun test src/services/squarespace.test.ts`)
+- Run tests in watch mode: `bun test --watch`
+- Test framework: Bun test with mocks
+- Test files location: `src/**/*.test.ts`
 
-## Code Style
+## Code style
 
-- **Formatting**: Prettier (2 spaces, 120 width, no trailing comma, with Astro and TailwindCSS plugins)
-- **TypeScript**: Strict settings enforced (extends astro/tsconfigs/strict)
-- **Styling**: Utility-first TailwindCSS (no @apply, v4.x)
-- **Components**: Modular Astro components with clear separation
-- **Performance**: Minimize client JS, static generation preferred
-- **Imports**: Follow TypeScript/Astro conventions, path aliases (@/_ for src/_)
-- **Naming**: Descriptive, camelCase for variables/functions, PascalCase for components
-- **Error Handling**: Graceful with appropriate logging
-- **Commits**: Conventional commits (type(scope): description)
-- **Testing**: Bun test framework with mocks, descriptive test names
-- **JSX**: React JSX syntax (jsx: "react-jsx", jsxImportSource: "react")
+- TypeScript strict mode (extends astro/tsconfigs/strict)
+- Formatting: Prettier (2 spaces, 120 width, no trailing comma, with Astro and TailwindCSS plugins)
+- Styling: Utility-first TailwindCSS (no @apply, v4.x)
+- Components: Modular Astro components with clear separation
+- Imports: Follow TypeScript/Astro conventions, path aliases (@/* for src/*)
+- Naming: Descriptive, camelCase for variables/functions, PascalCase for components
+- JSX: React JSX syntax (jsx: "react-jsx", jsxImportSource: "react")
+- Commits: Conventional commits (type(scope): description)
 
-## Project Structure
+## Project overview
+
+This is a skateboard design and ordering web application built with Astro and Bknd.io. Users can customize skateboard designs, place orders, and integrate with payment processing and Squarespace.
+
+## Project structure
 
 - `src/components/`: Astro components
 - `src/pages/`: File-based routing
 - `src/layouts/`: Page layouts
 - `src/actions/`: Server actions
-- `src/services/`: Business logic
+- `src/services/`: Business logic (Squarespace API, Stripe, etc.)
 - `src/utils/`: Utility functions
 - `src/types/`: Type definitions
 - `public/`: Static assets
-- `bknd.config.ts`: Backend configuration
+- `bknd.config.ts`: Backend configuration (database schema, auth, media)
 
 ## Rules
 
@@ -60,3 +56,5 @@
 - Implement proper cache control headers
 - Prioritize static generation and minimal JavaScript
 - Use descriptive variable names and follow Astro's conventions
+- Error handling: Graceful with appropriate logging
+- Performance: Minimize client JS, static generation preferred
