@@ -4,7 +4,6 @@ import { z } from "zod";
 
 export interface SkateboardOrder {
   id?: string;
-  userId?: string;
   design: {
     imageUrl: string;
     panX: number;
@@ -90,7 +89,6 @@ export const OrderPricingSchema = z.object({
 
 export const SkateboardOrderSchema = z.object({
   id: z.string().optional(),
-  userId: z.string().optional(),
   design: DesignConfigSchema,
   customer: CustomerInfoSchema,
   pricing: OrderPricingSchema,

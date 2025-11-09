@@ -10,9 +10,6 @@ const schema = em(
   {
     orders: entity("orders", {
       // "id" is automatically added
-      userId: text({
-        label: "User ID"
-      }), // foreign key to bknd user
       email: text({
         label: "User Email"
       }),
@@ -100,7 +97,6 @@ const schema = em(
   },
   ({ relation, index }, { orders, media }) => {
     index(orders)
-      .on(["userId"]) // Index for user's orders lookup
       .on(["status"]) // Index for status filtering
       .on(["createdAt"]); // Index for chronological ordering
 

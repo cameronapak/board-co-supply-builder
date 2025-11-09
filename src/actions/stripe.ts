@@ -35,7 +35,6 @@ export const stripe = {
             quantity: 1
           }
         ],
-        // client_reference_id: userId,
         mode: "payment",
         phone_number_collection: {
           enabled: true
