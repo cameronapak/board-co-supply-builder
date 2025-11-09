@@ -13,6 +13,9 @@ const schema = em(
       userId: text({
         label: "User ID"
       }), // foreign key to bknd user
+      email: text({
+        label: "User Email"
+      }),
       size: enumm({
         enum: [{
           value: '8.0 inches',
@@ -48,9 +51,11 @@ const schema = em(
         }],
         label: "Skateboard Type",
       }),
-      stripeOrderId: text({
-        label: "Stripe Order ID"
-      }), // Squarespace order ID for tracking
+      stripeTransactionUrl: text({
+        label: "Stripe Transaction URL",
+        description: "Link to view transaction details on Stripe dashboard",
+        hidden: ["create", "form"]
+      }), // Link to view transaction on Stripe dashboard
       designConfig: text({
         label: "Design Configuration"
       }), // JSON string for skateboard design configuration
@@ -67,7 +72,11 @@ const schema = em(
         label: "Order Status",
         default_value: "pending"
       }),
-      emailSent: boolean({ default_value: false }),
+      emailSent: boolean({
+        label: "Email Sent",
+        description: "Whether the email has been sent to the owner of the shop",
+        default_value: false,
+      }),
       comments: text({
         label: "Comments"
       }),
@@ -92,7 +101,6 @@ const schema = em(
   ({ relation, index }, { orders, media }) => {
     index(orders)
       .on(["userId"]) // Index for user's orders lookup
-      .on(["stripeOrderId"]) // Index for Stripe integration
       .on(["status"]) // Index for status filtering
       .on(["createdAt"]); // Index for chronological ordering
 

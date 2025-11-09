@@ -8,7 +8,7 @@ const getStripeInstance = () => new Stripe(
     ? STRIPE_SECRET_KEY
     : STRIPE_SECRET_TEST_KEY,
   {
-    apiVersion: "2025-07-30.basil",
+    apiVersion: "2025-08-27.basil",
     typescript: true
   }
 );
@@ -71,6 +71,24 @@ export const stripe = {
         })
       }
       return { session, lineItems };
+    }
+  }),
+
+  getTransactionIdFromSession: defineAction({
+    input: z.object({
+      sessionId: z.string()
+    }),
+    handler: async ({ sessionId }, _context) => {
+      const stripeInstance = getStripeInstance();
+      const session = await stripeInstance.checkout.sessions.retrieve(sessionId);
+      if (!session) {
+        throw new ActionError({
+          code: "NOT_FOUND"
+        })
+      }
+      return {
+        transactionId: session.payment_intent
+      };
     }
   })
 };

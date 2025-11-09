@@ -10,9 +10,16 @@ const stripeSessionId = Astro.url.searchParams.get("session_id") || "";
 
 let order = null as Orders | null;
 if (orderId && stripeSessionId) {
+  const { data: stripeData } = await Astro.callAction(actions.stripe.getSesssionFromId, { id: stripeSessionId });
+  const { data: transactionData } = await Astro.callAction(actions.stripe.getTransactionIdFromSession, {
+    sessionId: stripeSessionId
+  });
+
   const { data, error: _error } = await Astro.callAction(actions.bknd.attachStripeSessionIdToOrder, {
     orderId,
-    stripeSessionId
+    stripeSessionId,
+    email: stripeData?.session?.customer_details?.email || undefined,
+    stripeTransactionId: (transactionData?.transactionId as string) || undefined
   });
 
   if (data?.order) {
@@ -29,7 +36,7 @@ if (orderId && stripeSessionId) {
   <li>Order ID: ${order.id}</li>
   <li>Size: ${order.size || "N/A"}</li>
   <li>Type: ${order.type || "N/A"}</li>
-  <li>Stripe Order ID: ${order.stripeOrderId || "N/A"}</li>
+  <li>Stripe Transaction URL: <a href="${order.stripeTransactionUrl}" target="_blank">View Transaction</a></li>
   <li>Status: ${order.status || "N/A"}</li>
   <li>Created At: ${createdAt}</li>
   ${order.comments ? `<li>Comments: ${order.comments}</li>` : ""}

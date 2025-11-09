@@ -5,6 +5,8 @@ import type { Orders } from "@/bknd-types";
 import { getApi } from "@/bknd";
 // import { TypeSchema, SizeSchema } from "@/alpine/store";
 
+const STRIPE_ACCOUNT_ID = "acct_1L3520HtvrrwAy8n";
+
 export const bknd = {
   createOrder: defineAction({
     accept: "form",
@@ -53,12 +55,22 @@ export const bknd = {
     input: z.object({
       stripeSessionId: z.string(),
       orderId: z.number(),
+      email: z.string().email().optional(),
+      stripeTransactionId: z.string().optional(),
     }),
-    handler: async ({ stripeSessionId, orderId }, context) => {
+    handler: async ({ stripeSessionId, orderId, email, stripeTransactionId }, context) => {
       const api = await getApi(context.request.headers, { mode: "dynamic" });
+      const isProduction = import.meta.env.PROD;
+
+      // Transaction URL: https://dashboard.stripe.com/{ACCOUNT_ID}/[test/]payments/{PAYMENT_INTENT_ID}
+      const stripeTransactionUrl = stripeTransactionId
+       ? `https://dashboard.stripe.com/${STRIPE_ACCOUNT_ID}/${isProduction ? "" : "test/"}payments/${stripeTransactionId}`
+       : undefined;
+
       const { data: order, error } = await api.data.updateOne("orders", orderId, {
-        stripeOrderId: stripeSessionId,
         status: "complete",
+        ...(email ? { email } : {}),
+        ...(stripeTransactionUrl ? { stripeTransactionUrl } : {}),
       });
 
       // For some reason, when there isn't an order to update with
